@@ -1,6 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:Axon/core/extensions/context_extension.dart';
 import 'package:Axon/core/extensions/localization_ext.dart';
 import 'package:Axon/core/routes/app_routes.dart';
+import 'package:Axon/core/service/shared_pref/pref_keys.dart';
+import 'package:Axon/core/service/shared_pref/shared_pref.dart';
 import 'package:Axon/core/style/colors.dart';
 import 'package:Axon/core/widgets/text_app.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +21,7 @@ class _AccountCreatedViewState extends State<AccountCreatedView>
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _opacityAnimation;
+  final jsonString = SharedPref().getString(PrefKeys.fullLoginResponse);
 
   @override
   void initState() {
@@ -27,20 +32,23 @@ class _AccountCreatedViewState extends State<AccountCreatedView>
       duration: const Duration(milliseconds: 900),
     );
 
-    _scaleAnimation =
-        CurvedAnimation(parent: _controller, curve: Curves.elasticOut);
+    _scaleAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.elasticOut,
+    );
 
-    _opacityAnimation =
-        Tween<double>(begin: 0, end: 1).animate(_controller);
+    _opacityAnimation = Tween<double>(begin: 0, end: 1).animate(_controller);
 
     _controller.forward();
 
     Timer(const Duration(seconds: 2), () {
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        AppRoutes.patientMain,
-        (route) => false,
-      );
+      final Map<String, dynamic> data = jsonDecode(jsonString!);
+      if (data["data"]["role"] == "doctor") {
+        context.pushName(AppRoutes.doctorMain);
+      }else{
+                context.pushName(AppRoutes.home);
+
+      }
     });
   }
 

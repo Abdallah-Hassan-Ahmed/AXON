@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert'; 
 
 import 'package:Axon/core/errors/error_handler.dart';
 import 'package:Axon/core/errors/exceptions.dart';
@@ -7,13 +8,17 @@ import 'package:Axon/core/errors/mappers/exception_to_failure_mapper.dart';
 import 'package:Axon/core/network/api_manager.dart';
 import 'package:Axon/core/network/endpoints.dart';
 import 'package:Axon/core/network/network_info.dart';
+import 'package:Axon/core/service/shared_pref/pref_keys.dart';
+import 'package:Axon/core/service/shared_pref/shared_pref.dart';
 import 'package:Axon/features/auth/data/data_sourses/remote_data/auth_remote_data_source.dart';
 import 'package:Axon/features/auth/data/models/login_response_DM.dart';
 import 'package:Axon/features/auth/data/models/register_response_doctor_Dm.dart';
 import 'package:Axon/features/auth/data/models/register_response_patient_Dm.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:injectable/injectable.dart';
 
+@Injectable(as: AuthRemoteDataSource)
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final NetworkInfo networkInfo;
   final ApiManager apiManager;
@@ -25,37 +30,111 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   // ================= LOGIN =================
 
-  @override
-  Future<Either<Failure, LoginResponseDM>> login({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      // todo: check internet
-      if (!await networkInfo.isConnected) {
-        throw OfflineException();
-      }
 
-      // todo: call API
-      final response = await apiManager.post(Endpoints.login, {
-        "email": email,
-        "password": password,
-      });
+@override
+Future<Either<Failure, LoginResponseDM>> login({
+  required String email,
+  required String password,
+}) async {
+  try {
+    print("🚀 [LOGIN] Start");
 
-      // todo: parse
-      final loginResponse = LoginResponseDM.fromJson(response);
+    // 🌐 check internet
+    final isConnected = await networkInfo.isConnected;
+    print("🌐 [LOGIN] Internet: $isConnected");
 
-      return Right(loginResponse);
-    } on DioException catch (e) {
-      throw ErrorHandler.handle(e);
-    } on AppException catch (e) {
-      // todo exception → failure
-      return Left(mapExceptionToFailure(e));
-    } catch (e) {
-      return Left(ServerFailure());
+    if (!isConnected) {
+      print("❌ [LOGIN] No Internet");
+      throw OfflineException();
     }
-  }
 
+    // 📤 API call
+    print("📤 [LOGIN] Sending request...");
+    final response = await apiManager.post(Endpoints.login, {
+      "email": email,
+      "password": password,
+    });
+
+    print("📥 [LOGIN] Response: $response");
+
+    // ================= SAVE FULL RESPONSE =================
+
+    final responseString = jsonEncode(response);
+
+    await SharedPref().setString(
+      PrefKeys.fullLoginResponse,
+      responseString,
+    );
+
+    print("📦 [FULL RESPONSE RAW]: $responseString");
+
+    final savedResponse =
+        SharedPref().getString(PrefKeys.fullLoginResponse);
+
+    print("💾 [FULL RESPONSE FROM STORAGE]: $savedResponse");
+
+    // ================= PARSE =================
+
+    final loginResponse = LoginResponseDM.fromJson(response);
+
+    // ⚠️ التصحيح هنا 👇
+    final user = loginResponse.data;
+
+    // ================= SAVE USER =================
+
+    if (user != null) {
+      await SharedPref().setString(
+        PrefKeys.userId,
+        user.id.toString(),
+      );
+
+      await SharedPref().setString(
+        PrefKeys.userRole,
+        user.role ?? "",
+      );
+
+      print("👤 [USER] ID: ${user.id}");
+      print("🎭 [USER] Role: ${user.role}");
+    } else {
+      print("❌ [USER] user is null");
+    }
+
+    // ================= TOKEN =================
+
+    final accessToken =
+        SharedPref().getString(PrefKeys.accessToken);
+    final refreshToken =
+        SharedPref().getString(PrefKeys.refreshToken);
+
+    print("🔑 [TOKEN] Access: $accessToken");
+    print("🔄 [TOKEN] Refresh: $refreshToken");
+
+    print("✅ [LOGIN] Success");
+
+    return Right(loginResponse);
+
+  } on DioException catch (e) {
+    print("🔥 [LOGIN] Dio Error: ${e.message}");
+
+    final exception = ErrorHandler.handle(e);
+    print("⚠️ [LOGIN] Exception: $exception");
+
+    final failure = mapExceptionToFailure(exception);
+    print("❌ [LOGIN] Failure: $failure");
+
+    return Left(failure);
+
+  } on AppException catch (e) {
+    print("⚠️ [LOGIN] AppException: $e");
+
+    final failure = mapExceptionToFailure(e);
+    return Left(failure);
+
+  } catch (e) {
+    print("💥 [LOGIN] Unknown Error: $e");
+    return Left(ServerFailure());
+  }
+}
   @override
   Future<Either<Failure, RegisterResponseDoctorDm>> registerDoctor({
     required String fullName,
@@ -109,7 +188,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       var doctorResponse = RegisterResponseDoctorDm.fromJson(response);
       return Right(doctorResponse);
     } on DioException catch (e) {
-      throw ErrorHandler.handle(e);
+      final exception = ErrorHandler.handle(e); // AppException
+      return Left(mapExceptionToFailure(exception)); // ✅
     } on AppException catch (e) {
       // todo exception → failure
       return Left(mapExceptionToFailure(e));
@@ -212,7 +292,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       return Right(result);
     } on DioException catch (e) {
-      throw ErrorHandler.handle(e);
+      final exception = ErrorHandler.handle(e); // AppException
+      return Left(mapExceptionToFailure(exception)); // ✅
     } on AppException catch (e) {
       return Left(mapExceptionToFailure(e));
     } catch (e) {

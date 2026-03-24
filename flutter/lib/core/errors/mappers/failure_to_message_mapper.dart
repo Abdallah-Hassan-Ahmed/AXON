@@ -27,6 +27,16 @@ String mapFailureToMessage(Failure failure) {
     case UnmatchedPassFailure _:
       return UNMATCHED_PASSWORD_FAILURE_MESSAGE;
 
+    // 🔥 أهم إضافات
+    case UnauthorizedFailure _:
+      return UNAUTHORIZED_FAILURE_MESSAGE;
+
+    case NotFoundFailure _:
+      return NOT_FOUND_FAILURE_MESSAGE;
+
+    case ServerFailure _:
+      return SERVER_FAILURE_MESSAGE;
+
     default:
       return SERVER_FAILURE_MESSAGE;
   }

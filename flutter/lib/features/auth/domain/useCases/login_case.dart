@@ -2,7 +2,9 @@ import 'package:Axon/core/errors/failures.dart';
 import 'package:Axon/features/auth/domain/entities/login_response_entity.dart';
 import 'package:Axon/features/auth/domain/repo/auth_repo.dart';
 import 'package:dartz/dartz.dart';
+import 'package:injectable/injectable.dart';
 
+@injectable
 class LoginUseCase {
   final AuthRepo authRepo;
 

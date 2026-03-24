@@ -14,7 +14,7 @@ void main() async {
   await SharedPref.preferences.instantiatePreferences();
 
   Bloc.observer = AppBlocObserver();
-  // configureDependencies();
+  configureDependencies();
   runApp(const Axon());
 }
 

@@ -1,40 +1,33 @@
-import 'package:Axon/core/helpers/snackbar.dart';
+import 'package:Axon/core/errors/failures.dart';
+import 'package:Axon/features/auth/domain/entities/login_response_entity.dart';
+import 'package:Axon/features/auth/domain/useCases/login_case.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:injectable/injectable.dart';
 
 part 'login_state.dart';
-
+@injectable
 class LoginCubit extends Cubit<LoginState> {
-  LoginCubit() : super(LoginInitial());
+  final LoginUseCase loginUseCase;
+  LoginCubit({required this.loginUseCase}) : super(LoginInitial());
 
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final emailController = TextEditingController(text: "abdallah12@gmail.com");
+  final passwordController = TextEditingController(text: "P@assword123");
 
   final formKey = GlobalKey<FormState>();
 
   Future<void> login(BuildContext context) async {
-    if (!formKey.currentState!.validate()) {
-      Snackbar.showError(context, message: "Please fix the errors");
-      return;
+    if (formKey.currentState!.validate() == true) {
+      emit(LoginLoading());
+      var either = await loginUseCase.invoke(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+      either.fold(
+        (error) => emit(LoginError(failure: error)),
+        (response) => emit(LoginSuccess(loginResponseEntity: response)),
+        
+      );
     }
-
-    emit(LoginLoading());
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (emailController.text == "test@test.com" &&
-        passwordController.text == "Password123") {
-      Snackbar.showSuccess(context, message: "Login successful!");
-      emit(LoginSuccess());
-    } else {
-      Snackbar.showError(context, message: "Invalid credentials");
-      emit(LoginError("Invalid credentials"));
-    }
-  }
-
-  @override
-  Future<void> close() {
-    emailController.dispose();
-    passwordController.dispose();
-    return super.close();
   }
 }

@@ -28,9 +28,7 @@ class ErrorHandler {
         return ConflictException();
 
       case 422:
-        return ValidationException(
-          errors: e.response?.data["errors"],
-        );
+        return ValidationException(errors: e.response?.data["errors"]);
 
       case 429:
         return TooManyRequestsException();

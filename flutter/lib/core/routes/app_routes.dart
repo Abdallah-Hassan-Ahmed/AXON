@@ -15,7 +15,6 @@ import 'package:Axon/features/auth/Presentation/views/widgets/widget_patient/pat
 import 'package:Axon/features/auth/Presentation/views/widgets/widget_patient/patient_lab_tests_view.dart';
 import 'package:Axon/features/auth/Presentation/views/widgets/widget_patient/patient_medical_profile_view.dart';
 import 'package:Axon/features/auth/Presentation/views/widgets/widget_patient/patient_radiology_view.dart';
-import 'package:Axon/features/doctor/Articles%20Doctor/presentation/views/article_details_view.dart';
 import 'package:Axon/features/doctor/Chatting%20Doctor/presentation/views/doctor_chat_view.dart';
 import 'package:Axon/features/doctor/Chatting%20Doctor/presentation/views/doctor_show_patient_profile_view.dart';
 import 'package:Axon/features/doctor/Chatting%20Doctor/presentation/views/doctor_view_patient_allergies_view.dart';
@@ -154,7 +153,7 @@ static const viewAll = 'viewAll';
       case splash:
         return BaseRoute(page: const SplashView());
 
-         case intro :
+        case intro :
         return BaseRoute(page: const IntroView());
 
       case onBoarding:
@@ -165,7 +164,7 @@ static const viewAll = 'viewAll';
         return BaseRoute(page: const SelectRoleView());
 
       case login:
-        return BaseRoute(page: const LoginView());
+        return BaseRoute(page: LoginView());
 
       case registration:
         return BaseRoute(page: const RegistrationView());

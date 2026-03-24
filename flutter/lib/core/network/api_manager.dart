@@ -3,8 +3,10 @@ import 'package:Axon/core/service/shared_pref/pref_keys.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:injectable/injectable.dart';
 import 'endpoints.dart';
 
+@singleton
 class ApiManager {
   late Dio dio;
 
@@ -28,9 +30,14 @@ class ApiManager {
         onRequest: (options, handler) async {
           final token = SharedPref().getString(PrefKeys.accessToken);
 
-          // ✅ add token
+          // 🔥 PRINT TOKEN قبل ما يتبعت
+          print("🔑 [REQUEST] Current Token: $token");
+
           if (token != null && token.isNotEmpty) {
             options.headers["Authorization"] = "Bearer $token";
+            print("✅ [REQUEST] Token added to header");
+          } else {
+            print("❌ [REQUEST] No token found");
           }
 
           print("📤 ${options.method} ${options.uri}");
@@ -41,7 +48,7 @@ class ApiManager {
         },
 
         onResponse: (response, handler) async {
-          print("📥 Response: ${response.data}");
+          print("📥 [RESPONSE] Data: ${response.data}");
 
           await _saveTokens(response);
 
@@ -49,7 +56,7 @@ class ApiManager {
         },
 
         onError: (error, handler) {
-          print("❌ Error: ${error.message}");
+          print("❌ [ERROR] ${error.message}");
           handler.next(error);
         },
       ),
@@ -91,26 +98,42 @@ class ApiManager {
   Future<void> _saveTokens(Response response) async {
     final cookies = response.headers.map['set-cookie'];
 
-    if (cookies == null) return;
+    print("📦 [TOKENS] Headers: ${response.headers}");
+
+    if (cookies == null) {
+      print("❌ [TOKENS] No cookies found");
+      return;
+    }
 
     for (var cookie in cookies) {
-      // 🔥 access token
+      print("🍪 [TOKENS] Raw Cookie: $cookie");
+
+      // 🔥 Access Token
       if (cookie.contains("jwt=")) {
         final token = cookie.split(";").first.split("=").last;
 
         await SharedPref().setString(PrefKeys.accessToken, token);
 
-        print("✅ Access Token saved");
+        print("🔑 [TOKENS] Access Token saved:");
+        print("👉 $token");
       }
 
-      // 🔥 refresh token
+      // 🔥 Refresh Token
       if (cookie.contains("refreshToken=")) {
         final token = cookie.split(";").first.split("=").last;
 
         await SharedPref().setString(PrefKeys.refreshToken, token);
 
-        print("✅ Refresh Token saved");
+        print("🔄 [TOKENS] Refresh Token saved:");
+        print("👉 $token");
       }
     }
+
+    // 🔥 تأكيد إن التوكن اتسيف
+    final savedAccess = SharedPref().getString(PrefKeys.accessToken);
+    final savedRefresh = SharedPref().getString(PrefKeys.refreshToken);
+
+    print("💾 [TOKENS] Saved Access Token: $savedAccess");
+    print("💾 [TOKENS] Saved Refresh Token: $savedRefresh");
   }
 }

@@ -14,8 +14,8 @@ class MedicalProfileDM extends MedicalProfileEntity {
   factory MedicalProfileDM.fromJson(Map<String, dynamic> json) {
     return MedicalProfileDM(
       bloodType: json['bloodType'],
-      height: json['height'],
-      weight: json['weight'],
+height: (json['height'] as num?)?.toDouble(),
+weight: (json['weight'] as num?)?.toDouble(),
       conditions: (json['conditions'] as List?)?.cast<String>(),
       allergies: (json['allergies'] as List?)?.cast<String>(),
       radiologyTests: (json['radiologyTests'] as List?)
