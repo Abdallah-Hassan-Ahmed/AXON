@@ -1,4 +1,5 @@
 import 'package:Axon/core/bloc_observer.dart';
+import 'package:Axon/core/di/di.dart';
 import 'package:Axon/core/routes/app_routes.dart';
 import 'package:Axon/core/service/shared_pref/shared_pref.dart';
 import 'package:Axon/features/onboarding/presentation/manager/language_cubit/language_cubit.dart';
@@ -13,6 +14,7 @@ void main() async {
   await SharedPref.preferences.instantiatePreferences();
 
   Bloc.observer = AppBlocObserver();
+  // configureDependencies();
   runApp(const Axon());
 }
 
@@ -37,10 +39,7 @@ class Axon extends StatelessWidget {
                 locale: locale,
 
                 /// 🔹 Supported languages
-                supportedLocales: const [
-                  Locale('en'),
-                  Locale('ar'),
-                ],
+                supportedLocales: const [Locale('en'), Locale('ar')],
 
                 /// 🔹 Localization delegates (IMPORTANT)
                 localizationsDelegates: const [
@@ -52,8 +51,7 @@ class Axon extends StatelessWidget {
 
                 localeResolutionCallback: (locale, supportedLocales) {
                   for (final supportedLocale in supportedLocales) {
-                    if (supportedLocale.languageCode ==
-                        locale?.languageCode) {
+                    if (supportedLocale.languageCode == locale?.languageCode) {
                       return supportedLocale;
                     }
                   }

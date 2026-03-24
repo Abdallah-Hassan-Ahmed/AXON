@@ -1,7 +1,7 @@
 class MedicalProfileEntity {
   final String? bloodType;
-  final int? height;
-  final int? weight;
+  final double? height;
+  final double? weight;
   final List<String>? conditions;
   final List<String>? allergies;
   final List<RadiologyTestEntity>? radiologyTests;

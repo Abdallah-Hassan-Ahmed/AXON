@@ -63,6 +63,9 @@ dependencies:
   internet_connection_checker_plus: ^2.9.1+2
   dio_cookie_manager: ^3.4.0
   cookie_jar: ^4.0.9
+  injectable: ^2.7.1+4
+  
+  
 
   
 
@@ -73,7 +76,8 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.13.1
 
-  
+  injectable_generator: ^2.12.1
+  build_runner: ^2.13.1
   flutter_native_splash: ^2.4.7
 
 flutter_launcher_icons:

@@ -126,8 +126,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String phoneNumber,
     required String gender,
     required String bloodType,
-    required int height,
-    required int weight,
+    required double height,
+    required double weight,
     required List<String> conditions,
     required List<String> allergies,
     required List<File> radiologyImages,
@@ -142,88 +142,72 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         throw OfflineException();
       }
 
-      final patientData = FormData();
-
-      // ================= BASIC DATA =================
-      patientData.fields.addAll([
-        MapEntry("fullName", fullName),
-        MapEntry("email", email),
-        MapEntry("password", password),
-        MapEntry("phoneNumber", phoneNumber),
-        MapEntry("gender", gender),
-        MapEntry("bloodType", bloodType),
-        MapEntry("height", height.toString()),
-        MapEntry("weight", weight.toString()),
-      ]);
+      final data = FormData.fromMap({
+        "fullName": fullName,
+        "email": email,
+        "password": password,
+        "phoneNumber": phoneNumber,
+        "gender": gender,
+        "bloodType": bloodType,
+        "height": height,
+        "weight": weight,
+      });
 
       // ================= LISTS =================
-
-      // 🔥 conditions
-      for (var condition in conditions) {
-        patientData.fields.add(MapEntry("conditions", condition));
+      void addList(List<String> list, String key) {
+        for (var item in list) {
+          data.fields.add(MapEntry(key, item));
+        }
       }
 
-      // 🔥 allergies
-      for (var allergy in allergies) {
-        patientData.fields.add(MapEntry("allergies", allergy));
-      }
+      addList(conditions, "conditions");
+      addList(allergies, "allergies");
 
-      // ================= PERSONAL PHOTO =================
-      if (personalPhoto != null) {
-        patientData.files.add(
-          MapEntry(
-            "personalPhoto",
-            await MultipartFile.fromFile(
-              personalPhoto.path,
-              filename: personalPhoto.path.split('/').last,
-            ),
-          ),
-        );
-      }
-
-      // ================= RADIOLOGY =================
-      for (int i = 0; i < radiologyImages.length; i++) {
-        patientData.files.add(
-          MapEntry(
-            "radiologyImage",
-            await MultipartFile.fromFile(
-              radiologyImages[i].path,
-              filename: radiologyImages[i].path.split('/').last,
-            ),
-          ),
-        );
-
-        // description بنفس الترتيب
-        if (i < radiologyDescriptions.length) {
-          patientData.fields.add(
-            MapEntry("radiologyDescription", radiologyDescriptions[i]),
+      // ================= FILE =================
+      Future<void> addFile(File? file, String key) async {
+        if (file != null) {
+          data.files.add(
+            MapEntry(key, await MultipartFile.fromFile(file.path)),
           );
         }
       }
 
-      // ================= LAB =================
-      for (int i = 0; i < labImages.length; i++) {
-        patientData.files.add(
-          MapEntry(
-            "labImage",
-            await MultipartFile.fromFile(
-              labImages[i].path,
-              filename: labImages[i].path.split('/').last,
-            ),
-          ),
-        );
+      await addFile(personalPhoto, "personalPhoto");
 
-        if (i < labDescriptions.length) {
-          patientData.fields.add(MapEntry("labDescription", labDescriptions[i]));
+      // ================= MULTIPLE FILES =================
+      Future<void> addFilesWithDesc({
+        required List<File> files,
+        required List<String> descriptions,
+        required String fileKey,
+        required String descKey,
+      }) async {
+        for (int i = 0; i < files.length; i++) {
+          data.files.add(
+            MapEntry(fileKey, await MultipartFile.fromFile(files[i].path)),
+          );
+
+          if (i < descriptions.length) {
+            data.fields.add(MapEntry(descKey, descriptions[i]));
+          }
         }
       }
 
-      // ================= REQUEST =================
-      final response = await apiManager.post(
-        Endpoints.registerPatient,
-        patientData,
+      await addFilesWithDesc(
+        files: radiologyImages,
+        descriptions: radiologyDescriptions,
+        fileKey: "radiologyImage",
+        descKey: "radiologyDescription",
       );
 
+      await addFilesWithDesc(
+        files: labImages,
+        descriptions: labDescriptions,
+        fileKey: "labImage",
+        descKey: "labDescription",
+      );
+
+      // ================= REQUEST =================
+      final response = await apiManager.post(Endpoints.registerPatient, data);
       final result = RegisterResponsePatientDm.fromJson(response);
 
       return Right(result);

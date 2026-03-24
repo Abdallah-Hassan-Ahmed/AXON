@@ -3,7 +3,7 @@ import 'exceptions.dart';
 
 class ErrorHandler {
   static AppException handle(DioException e) {
-    // ⛔ timeout
+    // todo: timeout
     if (e.type == DioExceptionType.connectionTimeout ||
         e.type == DioExceptionType.receiveTimeout) {
       return TimeoutException();
