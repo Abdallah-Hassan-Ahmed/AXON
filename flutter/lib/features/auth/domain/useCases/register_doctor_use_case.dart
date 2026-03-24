@@ -4,7 +4,9 @@ import 'package:Axon/core/errors/failures.dart';
 import 'package:Axon/features/auth/domain/entities/register_response_doctor_entity.dart';
 import 'package:Axon/features/auth/domain/repo/auth_repo.dart';
 import 'package:dartz/dartz.dart';
+import 'package:injectable/injectable.dart';
 
+@injectable
 class RegisterDoctorUseCase {
   AuthRepo authRepo;
   RegisterDoctorUseCase({required this.authRepo});

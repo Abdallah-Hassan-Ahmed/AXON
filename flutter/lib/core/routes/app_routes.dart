@@ -290,8 +290,8 @@ case patientMain:
 // Doctor Main
 case doctorMain:
   return BaseRoute(page: const DoctorMainView());
-case accountCreatedDoctor:
-  return BaseRoute(page: const AccountDoctorCreatedView());
+// case accountCreatedDoctor:
+  // return BaseRoute(page: const AccountDoctorCreatedView());
 
   // Doctor edit profile
 

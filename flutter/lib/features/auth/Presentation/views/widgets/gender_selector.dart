@@ -4,7 +4,7 @@ import 'package:Axon/core/widgets/text_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class GenderSelector extends StatelessWidget {
+class GenderSelector extends StatefulWidget {
   const GenderSelector({
     super.key,
     required this.selected,
@@ -13,7 +13,17 @@ class GenderSelector extends StatelessWidget {
 
   final int selected;
   final Function(int) onSelect;
+  
 
+  @override
+  
+  State<GenderSelector> createState() => _GenderSelectorState();
+  
+}
+
+class _GenderSelectorState extends State<GenderSelector> {
+
+  
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -26,11 +36,11 @@ class GenderSelector extends StatelessWidget {
   }
 
   Widget _item(String text, int index) {
-    final bool isActive = index == selected;
+    final bool isActive = index == widget.selected;
 
     return Expanded(
       child: GestureDetector(
-        onTap: () => onSelect(index),
+        onTap: () => widget.onSelect(index),
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 12.h),
           decoration: BoxDecoration(

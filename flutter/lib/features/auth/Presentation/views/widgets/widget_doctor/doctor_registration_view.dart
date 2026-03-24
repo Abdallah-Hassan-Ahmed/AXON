@@ -40,16 +40,26 @@ class DoctorRegistrationView extends StatelessWidget {
             FormLabel(text: context.l10n.specialization),
             BlocBuilder<DoctorRegistrationCubit, DoctorRegistrationState>(
               builder: (context, state) {
+                final selected = state is DoctorRegistrationInitial
+                    ? state.selectedSpecialization
+                    : null;
+
                 return ReusableDropdown(
                   hint: context.l10n.select_specialization,
-                  value: state.selectedSpecialization,
+                  value: selected,
                   items: [
                     context.l10n.cardiology,
                     context.l10n.neurology,
                     context.l10n.pediatrics,
                     context.l10n.dentistry,
                   ],
-                  onChanged: (v) => cubit.changeSpecialization(v!),
+                  onChanged: (v) {
+                    if (v != null) {
+                      context
+                          .read<DoctorRegistrationCubit>()
+                          .changeSpecialization(v);
+                    }
+                  },
                 );
               },
             ),
@@ -93,13 +103,7 @@ class DoctorRegistrationView extends StatelessWidget {
             CustomButton(
               text: context.l10n.create_account,
               height: 50.h,
-              onPressed: () {
-                cubit.submit();
-                Navigator.pushNamed(
-                  context,
-                  AppRoutes.accountCreatedDoctor,
-                );
-              },
+              onPressed: () {},
             ),
 
             SizedBox(height: 25.h),

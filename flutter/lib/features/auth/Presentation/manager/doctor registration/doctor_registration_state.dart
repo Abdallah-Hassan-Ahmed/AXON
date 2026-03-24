@@ -1,26 +1,30 @@
-import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 
-class DoctorRegistrationState {
+abstract class DoctorRegistrationState {}
+
+class DoctorRegistrationInitial extends DoctorRegistrationState {
   final String? selectedSpecialization;
-  final PlatformFile? uploadedFile;
-  final String? price;
+  final XFile? uploadedFile;
 
-  DoctorRegistrationState({
+  DoctorRegistrationInitial({
     this.selectedSpecialization,
     this.uploadedFile,
-    this.price,
   });
+}
 
-  DoctorRegistrationState copyWith({
-    String? selectedSpecialization,
-    PlatformFile? uploadedFile,
-    String? price,
-  }) {
-    return DoctorRegistrationState(
-      selectedSpecialization:
-          selectedSpecialization ?? this.selectedSpecialization,
-      uploadedFile: uploadedFile ?? this.uploadedFile,
-      price: price ?? this.price,
-    );
-  }
+class DoctorRegistrationLoading extends DoctorRegistrationState {}
+
+class DoctorRegistrationSuccess extends DoctorRegistrationState {
+  final dynamic registerDoctorEntity;
+  DoctorRegistrationSuccess({this.registerDoctorEntity});
+}
+
+class DoctorRegistrationError extends DoctorRegistrationState {
+  final dynamic failure;
+  DoctorRegistrationError({required this.failure});
+}
+
+class DoctorRegistrationErrorMessage extends DoctorRegistrationState {
+  final String message;
+  DoctorRegistrationErrorMessage(this.message);
 }

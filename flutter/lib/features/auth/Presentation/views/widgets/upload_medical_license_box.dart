@@ -4,6 +4,7 @@ import 'package:Axon/features/auth/Presentation/manager/doctor%20registration/do
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 
 class UploadMedicalLicenseBox extends StatelessWidget {
   const UploadMedicalLicenseBox({super.key});
@@ -16,6 +17,12 @@ class UploadMedicalLicenseBox extends StatelessWidget {
       },
       child: BlocBuilder<DoctorRegistrationCubit, DoctorRegistrationState>(
         builder: (context, state) {
+          XFile? file;
+
+          if (state is DoctorRegistrationInitial) {
+            file = state.uploadedFile;
+          }
+
           return Container(
             height: 120.h,
             decoration: BoxDecoration(
@@ -23,41 +30,21 @@ class UploadMedicalLicenseBox extends StatelessWidget {
               border: Border.all(color: Colors.grey.shade300),
             ),
             child: Center(
-              child: state?.uploadedFile == null
+              child: file == null
                   ? Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.cloud_upload_outlined,
-                          size: 32,
-                          color: Colors.grey.shade600,
-                        ),
-                        SizedBox(height: 10.h),
-                        Text(
-                          context.l10n.drag_upload,
-                          style: TextStyle(color: Colors.grey.shade600),
-                        ),
-                        Text(
-                          context.l10n.max_file_size,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade500,
-                          ),
-                        ),
+                        Icon(Icons.cloud_upload_outlined),
+                        SizedBox(height: 10),
+                        Text(context.l10n.drag_upload),
                       ],
                     )
                   : Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.check_circle, color: Colors.green, size: 32),
-                        SizedBox(height: 10.h),
-                        Text(
-                          "${context.l10n.upload_medical_license}: ${state.uploadedFile!.name}",
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        Icon(Icons.check_circle, color: Colors.green),
+                        SizedBox(height: 10),
+                        Text(file.name),
                       ],
                     ),
             ),

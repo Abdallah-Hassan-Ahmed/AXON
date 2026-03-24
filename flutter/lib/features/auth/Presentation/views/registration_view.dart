@@ -1,9 +1,13 @@
+import 'package:Axon/core/di/di.dart';
 import 'package:Axon/core/helpers/validation_helper.dart';
 import 'package:Axon/core/routes/app_routes.dart';
 import 'package:Axon/core/style/colors.dart';
 import 'package:Axon/core/widgets/custom_button.dart';
 import 'package:Axon/core/widgets/custom_text_field.dart';
 import 'package:Axon/core/widgets/text_app.dart';
+import 'package:Axon/features/auth/Presentation/manager/doctor%20registration/doctor_registration_cubit.dart';
+import 'package:Axon/features/auth/Presentation/manager/doctor%20registration/doctor_registration_state.dart';
+import 'package:Axon/features/auth/Presentation/manager/selected%20gender/gender_cubit.dart';
 import 'package:Axon/features/auth/Presentation/manager/signup/registration_cubit.dart';
 import 'package:Axon/features/auth/Presentation/manager/upload image/upload_image_cubit.dart';
 import 'package:flutter/material.dart';
@@ -13,23 +17,23 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'widgets/form_label.dart';
 import 'widgets/gender_selector.dart';
 import 'widgets/registration_profile_image.dart';
-import 'widgets/terms_checkbox.dart';
 import 'package:Axon/core/extensions/localization_ext.dart';
 
-
 class RegistrationView extends StatelessWidget {
-  const RegistrationView({super.key});
+  RegistrationView({super.key});
+
+  DoctorRegistrationCubit doctorRegistrationCubit = getIt<DoctorRegistrationCubit>();
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => RegistrationCubit()),
+        BlocProvider(create: (_) => doctorRegistrationCubit),
         BlocProvider(create: (_) => UploadImageCubit()),
       ],
-      child: BlocBuilder<RegistrationCubit, RegistrationState>(
+      child: BlocBuilder<DoctorRegistrationCubit, DoctorRegistrationState>(
         builder: (context, state) {
-          final regCubit = context.read<RegistrationCubit>();
+          final doctorCubit = context.read<DoctorRegistrationCubit>();
           final imageCubit = context.watch<UploadImageCubit>();
 
           return Scaffold(
@@ -37,7 +41,7 @@ class RegistrationView extends StatelessWidget {
             body: SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: 24.w),
               child: Form(
-                key: regCubit.formKey,
+                key: doctorRegistrationCubit.formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -54,7 +58,7 @@ class RegistrationView extends StatelessWidget {
 
                     FormLabel(text: context.l10n.full_name),
                     CustomTextField(
-                      controller: regCubit.fullNameController,
+                      controller: doctorRegistrationCubit.fullNameController,
                       hintText: context.l10n.enter_full_name,
                       validator: ValidationHelper.validateName,
                     ),
@@ -64,7 +68,7 @@ class RegistrationView extends StatelessWidget {
                     FormLabel(text: context.l10n.email),
                     SizedBox(height: 8.h),
                     CustomTextField(
-                      controller: regCubit.emailController,
+                      controller: doctorRegistrationCubit.emailController,
                       hintText: context.l10n.enter_email,
                       validator: ValidationHelper.validateEmail,
                     ),
@@ -73,7 +77,7 @@ class RegistrationView extends StatelessWidget {
 
                     FormLabel(text: context.l10n.phone_number),
                     CustomTextField(
-                      controller: regCubit.phoneController,
+                      controller: doctorRegistrationCubit.phoneController,
                       hintText: context.l10n.enter_phone,
                       validator: ValidationHelper.validatePhone,
                     ),
@@ -81,16 +85,22 @@ class RegistrationView extends StatelessWidget {
                     SizedBox(height: 22.h),
 
                     FormLabel(text: context.l10n.gender),
-                    GenderSelector(
-                      selected: regCubit.selectedGender,
-                      onSelect: regCubit.pickGender,
+                    BlocBuilder<GenderCubit, int>(
+                      builder: (context, selectedGender) {
+                        return GenderSelector(
+                          selected: selectedGender,
+                          onSelect: (index) {
+                            context.read<GenderCubit>().changeGender(index);
+                          },
+                        );
+                      },
                     ),
 
                     SizedBox(height: 22.h),
 
                     FormLabel(text: context.l10n.password),
                     CustomTextField(
-                      controller: regCubit.passwordController,
+                      controller: doctorRegistrationCubit.passwordController,
                       hintText: context.l10n.create_password,
                       isPassword: true,
                       validator: ValidationHelper.validatePassword,
@@ -98,10 +108,10 @@ class RegistrationView extends StatelessWidget {
 
                     SizedBox(height: 15.h),
 
-                    TermsCheckbox(
-                      checked: regCubit.termsAccepted,
-                      onChanged: regCubit.toggleTerms,
-                    ),
+                    // TermsCheckbox(
+                    //   checked: doctorCubit.termsAccepted,
+                    //   onChanged: regCubit.toggleTerms,
+                    // ),
 
                     SizedBox(height: 20.h),
 
