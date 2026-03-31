@@ -5,6 +5,7 @@ import 'package:Axon/core/style/colors.dart';
 import 'package:Axon/core/widgets/custom_button.dart';
 import 'package:Axon/features/auth/Presentation/manager/patient_dynamic_list/patient_dynamic_list_cubit.dart';
 import 'package:Axon/features/auth/Presentation/manager/patient_dynamic_list/patient_dynamic_list_state.dart';
+import 'package:Axon/features/auth/Presentation/manager/patient_registration/patient_registration_cubit.dart';
 import 'package:Axon/features/auth/Presentation/views/widgets/center_icon_header.dart';
 import 'package:Axon/features/auth/Presentation/views/widgets/patient_dynamic_input_card.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +17,18 @@ class PatientAllergiesView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => PatientDynamicListCubit(),
+    final registrationCubit = context.read<PatientRegistrationCubit>();
+
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => PatientDynamicListCubit(),
+        ),
+
+        BlocProvider.value(
+          value: registrationCubit,
+        ),
+      ],
       child: Builder(
         builder: (context) {
           return Scaffold(
@@ -36,6 +47,18 @@ class PatientAllergiesView extends StatelessWidget {
               child: CustomButton(
                 text: context.l10n.next,
                 onPressed: () {
+
+                  final dynamicCubit = context.read<PatientDynamicListCubit>();
+                  final registrationCubit = context.read<PatientRegistrationCubit>();
+
+                  for (var item in dynamicCubit.state.items) {
+                    final text = item.controller.text.trim();
+
+                    if (text.isNotEmpty) {
+                      registrationCubit.addAllergy(text);
+                    }
+                  }
+
                   context.pushName(AppRoutes.patientRadiology);
                 },
               ),
@@ -49,12 +72,15 @@ class PatientAllergiesView extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: 55.h),
+
                       CenterIconHeader(
                         icon: Icons.error_outline_rounded,
                         title: context.l10n.allergies,
                         subtitle: context.l10n.add_allergies,
                       ),
+
                       SizedBox(height: 30.h),
+
                       ...List.generate(
                         state.items.length,
                         (index) => PatientDynamicInputCard(
@@ -62,6 +88,7 @@ class PatientAllergiesView extends StatelessWidget {
                           hint: context.l10n.enter_allergy,
                         ),
                       ),
+
                       SizedBox(height: 120.h),
                     ],
                   ),

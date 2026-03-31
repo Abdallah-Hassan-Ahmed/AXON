@@ -23,12 +23,16 @@ import '../../features/auth/domain/repo/auth_repo.dart' as _i170;
 import '../../features/auth/domain/useCases/login_case.dart' as _i861;
 import '../../features/auth/domain/useCases/register_doctor_use_case.dart'
     as _i646;
+import '../../features/auth/domain/useCases/register_patient_use_case.dart'
+    as _i797;
 import '../../features/auth/Presentation/manager/doctor%20registration/doctor_registration_cubit.dart'
     as _i533;
 import '../../features/auth/Presentation/manager/general%20register%20data/general_register_cubit.dart'
     as _i613;
 import '../../features/auth/Presentation/manager/login/login_cubit.dart'
     as _i65;
+import '../../features/auth/Presentation/manager/patient_registration/patient_registration_cubit.dart'
+    as _i10;
 import '../../features/auth/Presentation/manager/selected%20gender/gender_cubit.dart'
     as _i631;
 import '../network/api_manager.dart' as _i119;
@@ -69,8 +73,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i861.LoginUseCase>(
       () => _i861.LoginUseCase(gh<_i170.AuthRepo>()),
     );
+    gh.factory<_i797.RegisterPatientUseCase>(
+      () => _i797.RegisterPatientUseCase(gh<_i170.AuthRepo>()),
+    );
     gh.factory<_i65.LoginCubit>(
       () => _i65.LoginCubit(loginUseCase: gh<_i861.LoginUseCase>()),
+    );
+    gh.factory<_i10.PatientRegistrationCubit>(
+      () => _i10.PatientRegistrationCubit(gh<_i797.RegisterPatientUseCase>()),
     );
     gh.factory<_i533.DoctorRegistrationCubit>(
       () => _i533.DoctorRegistrationCubit(

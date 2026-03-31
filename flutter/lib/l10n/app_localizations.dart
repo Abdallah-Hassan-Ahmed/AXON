@@ -428,6 +428,12 @@ abstract class AppLocalizations {
   /// **'MRI Scan'**
   String get mri_scan;
 
+  /// No description provided for @select_blood_type_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select blood type'**
+  String get select_blood_type_error;
+
   /// No description provided for @write_symptoms_hint.
   ///
   /// In en, this message translates to:

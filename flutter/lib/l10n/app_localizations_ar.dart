@@ -176,6 +176,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get mri_scan => 'تصوير بالرنين المغناطيسي';
 
   @override
+  String get select_blood_type_error => 'من فضلك اختر فصيلة الدم';
+
+  @override
   String get write_symptoms_hint =>
       'اكتب الأعراض أو المشكلة التي تعاني منها هنا...';
 

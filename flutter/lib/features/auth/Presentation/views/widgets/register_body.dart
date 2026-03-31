@@ -117,7 +117,7 @@ class RegisterBody extends StatelessWidget {
                         cubit.saveAllData(gender);
                         Navigator.pushNamed(
                           context,
-                          AppRoutes.registrationDoctor,
+                          AppRoutes.selectRole,
                         );
                       }
                     },

@@ -12,7 +12,7 @@ class GeneralRegisterCubit extends Cubit<GeneralRegisterState> {
   final formKey = GlobalKey<FormState>();
 
   final fullNameController = TextEditingController(text: "Ahmed Mohamed");
-  final emailController = TextEditingController(text: "ahmed@test.com");
+  final emailController = TextEditingController(text: "boda@gmail.com");
   final phoneController = TextEditingController(text: "01012345678");
   final passwordController = TextEditingController(text: "P@assword123456");
 

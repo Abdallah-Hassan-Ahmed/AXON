@@ -1,5 +1,4 @@
 import 'package:Axon/core/routes/base_routes.dart';
-import 'package:Axon/features/auth/Presentation/manager/doctor%20registration/doctor_registration_cubit.dart';
 import 'package:Axon/features/auth/Presentation/manager/patient_registration/patient_registration_cubit.dart';
 import 'package:Axon/features/auth/Presentation/views/forgot_password_email_view.dart';
 import 'package:Axon/features/auth/Presentation/views/forgot_password_otp_view.dart';
@@ -7,7 +6,6 @@ import 'package:Axon/features/auth/Presentation/views/login_view.dart';
 import 'package:Axon/features/auth/Presentation/views/registration_view.dart';
 import 'package:Axon/features/auth/Presentation/views/reset_password_view.dart';
 import 'package:Axon/features/auth/Presentation/views/select_role_view.dart';
-import 'package:Axon/features/auth/Presentation/views/widgets/widget_doctor/account_doctor_created_view.dart';
 import 'package:Axon/features/auth/Presentation/views/widgets/widget_doctor/doctor_registration_view.dart';
 import 'package:Axon/features/auth/Presentation/views/widgets/widget_patient/account_created_view.dart';
 import 'package:Axon/features/auth/Presentation/views/widgets/widget_patient/patient_allergies_view.dart';
@@ -180,10 +178,7 @@ static const viewAll = 'viewAll';
       // Patient Registration
       case patientMedicalProfile:
         return BaseRoute(
-          page: BlocProvider(
-            create: (_) => PatientRegistrationCubit(),
-            child: PatientMedicalProfileView(),
-          ),
+          page: PatientMedicalProfileView(),
         );
 
       
@@ -194,7 +189,7 @@ case AppRoutes.patientAllergies:
 
 case AppRoutes.patientHealthConditions:
   return BaseRoute(
-    page: const PatientHealthConditionsView(),
+    page:  PatientHealthConditionsView(),
   );
 
 

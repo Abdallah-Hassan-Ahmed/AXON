@@ -176,6 +176,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mri_scan => 'MRI Scan';
 
   @override
+  String get select_blood_type_error => 'Please select blood type';
+
+  @override
   String get write_symptoms_hint => 'Write your symptoms or problem here...';
 
   @override
