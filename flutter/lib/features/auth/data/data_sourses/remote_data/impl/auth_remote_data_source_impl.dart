@@ -69,21 +69,60 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   //todo : save user data
 
-  Future<void> saveUserData(Map<String, dynamic> json) async {
-    final pref = SharedPref();
+ Future<void> saveUserData(Map<String, dynamic> json) async {
 
-    print("saveeeeeeeeee data  : $json");
+  final pref = SharedPref();
 
-    await pref.setString(PrefKeys.accessToken, json["accessToken"] ?? "");
-    await pref.setString(PrefKeys.refreshToken, json["refreshToken"] ?? "");
-    await pref.setString(
-      PrefKeys.userId,
-      json["data"]?["id"]?.toString() ?? "",
-    );
-    await pref.setString(PrefKeys.userRole, json["data"]?["role"] ?? "");
+  print("========= SAVE USER DATA =========");
+  print(json);
+  print("==================================");
 
-    await pref.setString(PrefKeys.fullLoginResponse, jsonEncode(json));
-  }
+  /// status
+  await pref.setString(
+    PrefKeys.status,
+    json["status"]?.toString() ?? "",
+  );
+
+  /// message
+  await pref.setString(
+    PrefKeys.message,
+    json["message"]?.toString() ?? "",
+  );
+
+  /// access token
+  await pref.setString(
+    PrefKeys.accessToken,
+    json["accessToken"]?.toString() ?? "",
+  );
+
+  /// refresh token
+  await pref.setString(
+    PrefKeys.refreshToken,
+    json["refreshToken"]?.toString() ?? "",
+  );
+
+  /// user id
+  await pref.setString(
+    PrefKeys.userId,
+    json["data"]?["id"]?.toString() ?? "",
+  );
+
+  /// role
+  await pref.setString(
+    PrefKeys.userRole,
+    json["data"]?["role"]?.toString() ?? "",
+  );
+
+  /// email
+  await pref.setString(
+    PrefKeys.userEmail,
+    json["data"]?["email"]?.toString() ?? "",
+  );
+
+  print("Saved Role: ${pref.getString(PrefKeys.userRole)}");
+  print("Saved ID: ${pref.getString(PrefKeys.userId)}");
+  print("Saved Email: ${pref.getString(PrefKeys.userEmail)}");
+}
 
   // todo : login
 
@@ -191,79 +230,108 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-  // todo : signup patient
+ // todo : signup patient
 
-  @override
-  Future<Either<Failure, RegisterResponsePatientDm>> registerPatient({
-    required String fullName,
-    required String email,
-    required String password,
-    required String phoneNumber,
-    required String gender,
-    required String bloodType,
-    required double height,
-    required double weight,
-    required List<String> conditions,
-    required List<String> allergies,
-    required List<File> radiologyImages,
-    required List<String> radiologyDescriptions,
-    required List<File> labImages,
-    required List<String> labDescriptions,
-    File? personalPhoto,
-  }) async {
-    try {
-      if (!await networkInfo.isConnected) {
-        throw OfflineException();
-      }
-
-      final data = FormData.fromMap({
-        "fullName": fullName,
-        "email": email,
-        "password": password,
-        "phoneNumber": phoneNumber,
-        "gender": gender,
-        "bloodType": bloodType,
-        "height": height,
-        "weight": weight,
-      });
-
-      addList(data, conditions, "conditions");
-      addList(data, allergies, "allergies");
-
-      await addFile(data, personalPhoto, "personalPhoto");
-
-      await addFilesWithDesc(
-        data: data,
-        files: radiologyImages,
-        descriptions: radiologyDescriptions,
-        fileKey: "radiologyImage",
-        descKey: "radiologyDescription",
-      );
-
-      await addFilesWithDesc(
-        data: data,
-        files: labImages,
-        descriptions: labDescriptions,
-        fileKey: "labImage",
-        descKey: "labDescription",
-      );
-
-      final response = await apiManager.post(Endpoints.registerPatient, data);
-
-      print("response patient: $response");
-
-      await saveUserData(response);
-
-      final result = RegisterResponsePatientDm.fromJson(response);
-      return Right(result);
-    } on DioException catch (e) {
-      print("register patient error: ${e.response?.data}");
-      return Left(mapExceptionToFailure(ErrorHandler.handle(e)));
-    } on AppException catch (e) {
-      return Left(mapExceptionToFailure(e));
-    } catch (e) {
-      print("unknown error: $e");
-      return Left(ServerFailure());
+@override
+Future<Either<Failure, RegisterResponsePatientDm>> registerPatient({
+  required String fullName,
+  required String email,
+  required String password,
+  required String phoneNumber,
+  required String gender,
+  required String bloodType,
+  required double height,
+  required double weight,
+  required List<String> conditions,
+  required List<String> allergies,
+  required List<File> radiologyImages,
+  required List<String> radiologyDescriptions,
+  required List<File> labImages,
+  required List<String> labDescriptions,
+  File? personalPhoto,
+}) async {
+  try {
+    if (!await networkInfo.isConnected) {
+      throw OfflineException();
     }
+
+    /// 🔎 DEBUG prints
+    print("========= DEBUG REGISTER PATIENT =========");
+    print("Personal Photo: ${personalPhoto?.path}");
+    print("Radiology Images Count: ${radiologyImages.length}");
+    print("Lab Images Count: ${labImages.length}");
+    print("==========================================");
+
+    final data = FormData.fromMap({
+      "fullName": fullName,
+      "email": email,
+      "password": password,
+      "phoneNumber": phoneNumber,
+      "gender": gender,
+      "bloodType": bloodType,
+      "height": height,
+      "weight": weight,
+    });
+
+    addList(data, conditions, "conditions");
+    addList(data, allergies, "allergies");
+
+    /// personal photo
+    await addFile(data, personalPhoto, "personalPhoto");
+
+    /// radiology
+    await addFilesWithDesc(
+      data: data,
+      files: radiologyImages,
+      descriptions: radiologyDescriptions,
+      fileKey: "radiologyImage",
+      descKey: "radiologyDescription",
+    );
+
+    /// lab tests
+    await addFilesWithDesc(
+      data: data,
+      files: labImages,
+      descriptions: labDescriptions,
+      fileKey: "labImage",
+      descKey: "labDescription",
+    );
+
+    /// 🔎 Print FormData before request
+    print("=========== FORM DATA ===========");
+
+    print("Fields:");
+    for (var field in data.fields) {
+      print("${field.key}: ${field.value}");
+    }
+
+    print("Files:");
+    for (var file in data.files) {
+      print("${file.key}: ${file.value.filename}");
+    }
+
+    print("=================================");
+
+    final response = await apiManager.post(
+      Endpoints.registerPatient,
+      data,
+    );
+
+    print("response patient: $response");
+
+    await saveUserData(response);
+
+    final result = RegisterResponsePatientDm.fromJson(response);
+    return Right(result);
+
+  } on DioException catch (e) {
+    print("register patient error: ${e.response?.data}");
+    return Left(mapExceptionToFailure(ErrorHandler.handle(e)));
+  } on AppException catch (e) {
+    return Left(mapExceptionToFailure(e));
+  } catch (e) {
+    print("unknown error: $e");
+    return Left(ServerFailure());
   }
+}
 }

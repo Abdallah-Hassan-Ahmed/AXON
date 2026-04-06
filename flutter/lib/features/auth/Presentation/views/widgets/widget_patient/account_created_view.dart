@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:Axon/core/extensions/context_extension.dart';
 import 'package:Axon/core/extensions/localization_ext.dart';
 import 'package:Axon/core/routes/app_routes.dart';
@@ -18,17 +17,14 @@ class AccountCreatedView extends StatefulWidget {
 
 class _AccountCreatedViewState extends State<AccountCreatedView>
     with SingleTickerProviderStateMixin {
+
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _opacityAnimation;
 
-  String? jsonString;
-
   @override
   void initState() {
     super.initState();
-
-    jsonString = SharedPref().getString(PrefKeys.fullLoginResponse);
 
     _controller = AnimationController(
       vsync: this,
@@ -50,26 +46,33 @@ class _AccountCreatedViewState extends State<AccountCreatedView>
   }
 
   void _handleNavigation() {
-    try {
-      if (jsonString == null || jsonString!.isEmpty) {
-        context.pushName(AppRoutes.patientMain);
-        return;
-      }
 
-      final Map<String, dynamic> data = jsonDecode(jsonString!);
+  final role =
+      SharedPref.preferences.getString(PrefKeys.userRole);
 
-      final role = data["data"]?["role"];
+  print("========== ACCOUNT CREATED DEBUG ==========");
+  print("Role from SharedPref: $role");
+  print("===========================================");
 
-      if (role == "doctor") {
-        context.pushName(AppRoutes.doctorMain);
-      } else {
-        context.pushName(AppRoutes.patientMain);
-      }
-    } catch (e) {
-      // fallback لو حصل أي error
-      context.pushName(AppRoutes.patientMain);
-    }
+  if (role == "doctor") {
+
+    print("➡️ Navigate to DOCTOR HOME");
+
+    context.pushName(AppRoutes.doctorMain);
+
+  } else if (role == "patient") {
+
+    print("➡️ Navigate to PATIENT HOME");
+
+    context.pushName(AppRoutes.patientMain);
+
+  } else {
+
+    print("⚠️ Role is null → fallback to patientMain");
+
+    context.pushName(AppRoutes.patientMain);
   }
+}
 
   @override
   void dispose() {
@@ -79,16 +82,22 @@ class _AccountCreatedViewState extends State<AccountCreatedView>
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: AppColors.white,
+
       body: Center(
         child: FadeTransition(
           opacity: _opacityAnimation,
+
           child: ScaleTransition(
             scale: _scaleAnimation,
+
             child: Column(
               mainAxisSize: MainAxisSize.min,
+
               children: [
+
                 Container(
                   width: 120,
                   height: 120,
@@ -102,7 +111,9 @@ class _AccountCreatedViewState extends State<AccountCreatedView>
                     size: 80,
                   ),
                 ),
+
                 const SizedBox(height: 24),
+
                 TextApp(
                   text: context.l10n.account_created,
                   weight: AppTextWeight.bold,
@@ -110,7 +121,9 @@ class _AccountCreatedViewState extends State<AccountCreatedView>
                   color: AppColors.black,
                   textAlign: TextAlign.center,
                 ),
+
                 const SizedBox(height: 8),
+
                 TextApp(
                   text: context.l10n.redirecting_home,
                   fontSize: 14,

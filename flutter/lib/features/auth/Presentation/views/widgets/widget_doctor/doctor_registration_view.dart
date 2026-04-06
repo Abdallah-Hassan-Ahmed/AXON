@@ -37,7 +37,7 @@ class DoctorRegistrationView extends StatelessWidget {
         if (state is DoctorRegistrationSuccess) {
           SharedPref().clearPreferences();
 
-          Navigator.pushReplacementNamed(context, AppRoutes.home);
+          Navigator.pushReplacementNamed(context, AppRoutes.accountCreated);
         }
       },
       builder: (context, state) {
