@@ -6,16 +6,19 @@ import 'package:Axon/features/auth/domain/useCases/register_patient_use_case.dar
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'patient_registration_state.dart';
+
 @injectable
 class PatientRegistrationCubit extends Cubit<PatientRegistrationState> {
+
   final RegisterPatientUseCase registerPatientUseCase;
   final pref = SharedPref();
 
-  PatientRegistrationCubit(this.registerPatientUseCase)
-    : super(PatientRegistrationFormState());
+  PatientRegistrationFormState _formState = PatientRegistrationFormState();
 
-  PatientRegistrationFormState get currentState =>
-      state as PatientRegistrationFormState;
+  PatientRegistrationCubit(this.registerPatientUseCase)
+      : super(PatientRegistrationFormState());
+
+  PatientRegistrationFormState get currentState => _formState;
 
   /// update medical profile
   void updateMedicalProfile({
@@ -23,147 +26,190 @@ class PatientRegistrationCubit extends Cubit<PatientRegistrationState> {
     double? height,
     double? weight,
   }) {
-    emit(
-      currentState.copyWith(
-        bloodType: bloodType,
-        height: height,
-        weight: weight,
-      ),
+
+    _formState = _formState.copyWith(
+      bloodType: bloodType,
+      height: height,
+      weight: weight,
     );
+
+    emit(_formState);
   }
 
   /// add condition
   void addCondition(String condition) {
-    final updatedList = List<String>.from(currentState.conditions)
+
+    final updatedList = List<String>.from(_formState.conditions)
       ..add(condition);
 
-    emit(currentState.copyWith(conditions: updatedList));
+    _formState = _formState.copyWith(
+      conditions: updatedList,
+    );
+
+    emit(_formState);
   }
 
   /// remove condition
   void removeCondition(String condition) {
-    final updatedList = List<String>.from(currentState.conditions)
+
+    final updatedList = List<String>.from(_formState.conditions)
       ..remove(condition);
 
-    emit(currentState.copyWith(conditions: updatedList));
+    _formState = _formState.copyWith(
+      conditions: updatedList,
+    );
+
+    emit(_formState);
   }
 
   /// add allergy
   void addAllergy(String allergy) {
-    final updatedList = List<String>.from(currentState.allergies)..add(allergy);
 
-    emit(currentState.copyWith(allergies: updatedList));
+    final updatedList = List<String>.from(_formState.allergies)
+      ..add(allergy);
+
+    _formState = _formState.copyWith(
+      allergies: updatedList,
+    );
+
+    emit(_formState);
   }
 
   /// remove allergy
   void removeAllergy(String allergy) {
-    final updatedList = List<String>.from(currentState.allergies)
+
+    final updatedList = List<String>.from(_formState.allergies)
       ..remove(allergy);
 
-    emit(currentState.copyWith(allergies: updatedList));
+    _formState = _formState.copyWith(
+      allergies: updatedList,
+    );
+
+    emit(_formState);
   }
 
   /// add radiology
   void addRadiology(RadiologyTestEntity radiology) {
+
     final updatedList = List<RadiologyTestEntity>.from(
-      currentState.radiologyTests,
+      _formState.radiologyTests,
     )..add(radiology);
 
-    emit(currentState.copyWith(radiologyTests: updatedList));
+    _formState = _formState.copyWith(
+      radiologyTests: updatedList,
+    );
+
+    emit(_formState);
   }
 
   /// remove radiology
   void removeRadiology(String id) {
-    final updatedList = currentState.radiologyTests
+
+    final updatedList = _formState.radiologyTests
         .where((test) => test.id != id)
         .toList();
 
-    emit(currentState.copyWith(radiologyTests: updatedList));
+    _formState = _formState.copyWith(
+      radiologyTests: updatedList,
+    );
+
+    emit(_formState);
   }
 
   /// add lab test
   void addLabTest(LabTestEntity lab) {
-    final updatedList = List<LabTestEntity>.from(currentState.labTests)
-      ..add(lab);
 
-    emit(currentState.copyWith(labTests: updatedList));
+    final updatedList = List<LabTestEntity>.from(
+      _formState.labTests,
+    )..add(lab);
+
+    _formState = _formState.copyWith(
+      labTests: updatedList,
+    );
+
+    emit(_formState);
   }
 
   /// remove lab test
   void removeLabTest(String id) {
-    final updatedList = currentState.labTests
+
+    final updatedList = _formState.labTests
         .where((test) => test.id != id)
         .toList();
 
-    emit(currentState.copyWith(labTests: updatedList));
+    _formState = _formState.copyWith(
+      labTests: updatedList,
+    );
+
+    emit(_formState);
   }
 
-  ///finishRegistration
-
+  /// finish registration
   Future<void> finishRegistration() async {
 
-  emit(PatientRegistrationLoading());
+    final formState = _formState;
 
-  /// Radiology Images
-  List<File> radiologyImages = currentState.radiologyTests
-      .where((e) => e.image != null)
-      .map((e) => File(e.image!))
-      .toList();
+    emit(PatientRegistrationLoading());
 
-  /// Radiology Descriptions
-  List<String> radiologyDescriptions = currentState.radiologyTests
-      .map((e) => e.description ?? '')
-      .toList();
+    /// Radiology Images
+    List<File> radiologyImages = formState.radiologyTests
+        .where((e) => e.image != null)
+        .map((e) => File(e.image!))
+        .toList();
 
-  /// Lab Images
-  List<File> labImages = currentState.labTests
-      .where((e) => e.image != null)
-      .map((e) => File(e.image!))
-      .toList();
+    /// Radiology Descriptions
+    List<String> radiologyDescriptions =
+        formState.radiologyTests
+            .map((e) => e.description ?? '')
+            .toList();
 
-  /// Lab Descriptions
-  List<String> labDescriptions = currentState.labTests
-      .map((e) => e.description ?? '')
-      .toList();
+    /// Lab Images
+    List<File> labImages = formState.labTests
+        .where((e) => e.image != null)
+        .map((e) => File(e.image!))
+        .toList();
 
-  var either = await registerPatientUseCase.invoke(
+    /// Lab Descriptions
+    List<String> labDescriptions =
+        formState.labTests
+            .map((e) => e.description ?? '')
+            .toList();
 
-    /// Personal Data
-    personalPhoto: pref.getString("personalPhoto") != null
-        ? File(pref.getString("personalPhoto")!)
-        : null,
+    var either = await registerPatientUseCase.invoke(
 
-    fullName: pref.getString("fullName") ?? '',
-    email: pref.getString("email") ?? '',
-    password: pref.getString("password") ?? '',
-    phoneNumber: pref.getString("phone") ?? '',
-    gender: pref.getString("gender") ?? '',
+      personalPhoto: pref.getString("personalPhoto") != null
+          ? File(pref.getString("personalPhoto")!)
+          : null,
 
-    /// Medical Profile
-    bloodType: currentState.bloodType ?? '',
-    height: currentState.height ?? 0,
-    weight: currentState.weight ?? 0,
+      fullName: pref.getString("fullName") ?? '',
+      email: pref.getString("email") ?? '',
+      password: pref.getString("password") ?? '',
+      phoneNumber: pref.getString("phone") ?? '',
+      gender: pref.getString("gender") ?? '',
 
-    conditions: currentState.conditions,
-    allergies: currentState.allergies,
+      bloodType: formState.bloodType ?? '',
+      height: formState.height ?? 0,
+      weight: formState.weight ?? 0,
 
-    /// Radiology
-    radiologyImages: radiologyImages,
-    radiologyDescriptions: radiologyDescriptions,
+      conditions: formState.conditions,
+      allergies: formState.allergies,
 
-    /// Lab
-    labImages: labImages,
-    labDescriptions: labDescriptions,
-  );
+      radiologyImages: radiologyImages,
+      radiologyDescriptions: radiologyDescriptions,
 
-  either.fold(
-    (failure) {
-      emit(PatientRegistrationError(failure: failure));
-    },
-    (data) {
-      emit(PatientRegistrationSuccess(registerPatientEntity: data));
-    },
-  );
-}
+      labImages: labImages,
+      labDescriptions: labDescriptions,
+    );
 
+    either.fold(
+      (failure) {
+        emit(PatientRegistrationError(failure: failure));
+      },
+      (data) {
+        emit(PatientRegistrationSuccess(
+          registerPatientEntity: data,
+        ));
+      },
+    );
+  }
 }

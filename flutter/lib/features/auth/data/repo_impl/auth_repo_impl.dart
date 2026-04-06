@@ -74,7 +74,7 @@ class AuthRepoImpl implements AuthRepo {
     required List<String> radiologyDescriptions,
     required List<File> labImages,
     required List<String> labDescriptions,
-    File? personalPhoto,
+      File? personalPhoto,
   }) async {
     var either = await authRemoteDataSource.registerPatient(
       fullName: fullName,
@@ -91,6 +91,7 @@ class AuthRepoImpl implements AuthRepo {
       radiologyDescriptions: radiologyDescriptions,
       labImages: labImages,
       labDescriptions: labDescriptions,
+      personalPhoto: personalPhoto
     );
     return either.fold((error) => Left(error), (response) => Right(response));
   }

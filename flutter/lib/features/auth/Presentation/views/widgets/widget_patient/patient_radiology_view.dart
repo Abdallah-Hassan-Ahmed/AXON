@@ -5,8 +5,10 @@ import 'package:Axon/core/style/colors.dart';
 import 'package:Axon/core/widgets/custom_button.dart';
 import 'package:Axon/features/auth/Presentation/manager/patient%20documents/atient_documents_cubit.dart';
 import 'package:Axon/features/auth/Presentation/manager/patient%20documents/patient_documents_state.dart';
+import 'package:Axon/features/auth/Presentation/manager/patient_registration/patient_registration_cubit.dart';
 import 'package:Axon/features/auth/Presentation/views/widgets/center_icon_header.dart';
 import 'package:Axon/features/auth/Presentation/views/widgets/upload_document_card.dart';
+import 'package:Axon/features/auth/domain/entities/medical_profile_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -114,9 +116,39 @@ class PatientRadiologyView extends StatelessWidget {
                       padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
                       child: CustomButton(
                         text: context.l10n.next,
-                        onPressed: () {
-                          blocContext.pushName(AppRoutes.patientLabTests);
-                        },
+                       onPressed: () {
+
+  final docsCubit = blocContext.read<PatientDocumentsCubit>();
+  final registerCubit = blocContext.read<PatientRegistrationCubit>();
+
+  for (var doc in docsCubit.state.documents) {
+
+    final hasImage = doc.file != null;
+    final hasDescription = doc.labelController.text.trim().isNotEmpty;
+
+    if (hasImage != hasDescription) {
+      ScaffoldMessenger.of(blocContext).showSnackBar(
+        const SnackBar(
+          content: Text("Please add both image and description"),
+        ),
+      );
+      return;
+    }
+
+    if (hasImage && hasDescription) {
+
+      registerCubit.addRadiology(
+        RadiologyTestEntity(
+          id: DateTime.now().toString(),
+          image: doc.file!.path,
+          description: doc.labelController.text.trim(),
+        ),
+      );
+    }
+  }
+
+  blocContext.pushName(AppRoutes.patientLabTests);
+}
                       ),
                     ),
                   ],

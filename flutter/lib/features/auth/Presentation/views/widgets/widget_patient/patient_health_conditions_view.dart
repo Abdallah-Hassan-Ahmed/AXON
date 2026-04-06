@@ -46,7 +46,6 @@ class PatientHealthConditionsView extends StatelessWidget {
                   final registrationCubit =
                       context.read<PatientRegistrationCubit>();
 
-                  /// نقل القيم إلى cubit التسجيل
                   for (var item in dynamicCubit.state.items) {
 
                     final text = item.controller.text.trim();
