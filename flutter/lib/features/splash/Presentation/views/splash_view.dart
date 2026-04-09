@@ -12,8 +12,10 @@ class SplashView extends StatefulWidget {
   State<SplashView> createState() => _SplashViewState();
 }
 
-class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
-  final SplashAnimationController _controller = SplashAnimationController();
+class _SplashViewState extends State<SplashView>
+    with TickerProviderStateMixin {
+  final SplashAnimationController _controller =
+      SplashAnimationController();
 
   @override
   void initState() {
@@ -23,6 +25,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
       vsync: this,
       onFinished: () {
         if (!mounted) return;
+
         Navigator.pushReplacementNamed(context, AppRoutes.intro);
       },
     );
@@ -40,10 +43,9 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
       body: Stack(
         children: [
           const SplashBackground(),
-
           SplashCenterLogo(animation: _controller.xFadeAnimation),
-
-          SplashBottomLetters(animation: _controller.lettersFadeAnimation),
+          SplashBottomLetters(
+              animation: _controller.lettersFadeAnimation),
         ],
       ),
     );

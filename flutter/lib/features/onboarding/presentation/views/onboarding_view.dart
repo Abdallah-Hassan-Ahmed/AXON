@@ -17,10 +17,13 @@ class OnBoardingView extends StatefulWidget {
 }
 
 class _OnBoardingViewState extends State<OnBoardingView> {
+
   int currentIndex = 0;
+  final PageController pageController = PageController();
 
   @override
   Widget build(BuildContext context) {
+
     final pages = [
       (
         image: AppImages.onboarding3,
@@ -39,8 +42,6 @@ class _OnBoardingViewState extends State<OnBoardingView> {
       ),
     ];
 
-    final page = pages[currentIndex];
-
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -48,55 +49,75 @@ class _OnBoardingViewState extends State<OnBoardingView> {
           padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Column(
             children: [
+
               SizedBox(height: 12.h),
 
-              /// Language / Skip
+              /// Skip
               Align(
                 alignment: AlignmentDirectional.centerEnd,
                 child: GestureDetector(
-                        onTap: () {
-                          context.pushReplacementNamed(AppRoutes.login);
-                        },
-                        child: TextApp(
-                          text: context.l10n.skip,
-                          fontSize: 14.sp,
-                          weight: AppTextWeight.regular,
-                          color: AppColors.grey,
-                        ),
-                      ),
+                  onTap: () {
+                    context.pushReplacementNamed(AppRoutes.login);
+                  },
+                  child: TextApp(
+                    text: context.l10n.skip,
+                    fontSize: 14.sp,
+                    weight: AppTextWeight.regular,
+                    color: AppColors.grey,
+                  ),
+                ),
               ),
 
               SizedBox(height: 12.h),
 
-              /// Image
+              /// PageView
               Expanded(
-                flex: 5,
-                child: OnBoardingImage(image: page.image),
+                child: PageView.builder(
+                  controller: pageController,
+                  itemCount: pages.length,
+                  onPageChanged: (index) {
+                    setState(() {
+                      currentIndex = index;
+                    });
+                  },
+                  itemBuilder: (context, index) {
+
+                    final page = pages[index];
+
+                    return Column(
+                      children: [
+
+                        Expanded(
+                          flex: 5,
+                          child: OnBoardingImage(image: page.image),
+                        ),
+
+                        SizedBox(height: 27.h),
+
+                        TextApp(
+                          text: page.title,
+                          weight: AppTextWeight.semiBold,
+                          fontSize: 22.sp,
+                          textAlign: TextAlign.center,
+                          color: AppColors.primaryColor,
+                        ),
+
+                        SizedBox(height: 10.h),
+
+                        TextApp(
+                          text: page.subtitle,
+                          weight: AppTextWeight.regular,
+                          fontSize: 14.sp,
+                          textAlign: TextAlign.center,
+                          color: AppColors.grey,
+                        ),
+
+                        SizedBox(height: 71.h),
+                      ],
+                    );
+                  },
+                ),
               ),
-
-              SizedBox(height: 27.h),
-
-              /// Title
-              TextApp(
-                text: page.title,
-                weight: AppTextWeight.semiBold,
-                fontSize: 22.sp,
-                textAlign: TextAlign.center,
-                color: AppColors.primaryColor,
-              ),
-
-              SizedBox(height: 10.h),
-
-              /// Subtitle
-              TextApp(
-                text: page.subtitle,
-                weight: AppTextWeight.regular,
-                fontSize: 14.sp,
-                textAlign: TextAlign.center,
-                color: AppColors.grey,
-              ),
-
-              SizedBox(height: 71.h),
 
               /// Indicators
               Row(
@@ -131,18 +152,23 @@ class _OnBoardingViewState extends State<OnBoardingView> {
                   borderRadius: 8.r,
                   fontSize: 18.sp,
                   onPressed: () {
+
                     if (currentIndex == pages.length - 1) {
                       context.pushReplacementNamed(AppRoutes.login);
                     } else {
-                      setState(() {
-                        currentIndex++;
-                      });
+
+                      pageController.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+
                     }
                   },
                 ),
               ),
 
               SizedBox(height: 25.h),
+
             ],
           ),
         ),

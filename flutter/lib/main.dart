@@ -1,6 +1,7 @@
 import 'package:Axon/core/bloc_observer.dart';
 import 'package:Axon/core/di/di.dart';
 import 'package:Axon/core/routes/app_routes.dart';
+import 'package:Axon/core/service/shared_pref/pref_keys.dart';
 import 'package:Axon/core/service/shared_pref/shared_pref.dart';
 import 'package:Axon/features/onboarding/presentation/manager/language_cubit/language_cubit.dart';
 import 'package:Axon/l10n/app_localizations.dart';
@@ -13,13 +14,31 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPref.preferences.instantiatePreferences();
 
+  final pref = SharedPref();
+
+  final token = pref.getString(PrefKeys.accessToken);
+  final role = pref.getString(PrefKeys.userRole);
+
+  String startRoute = AppRoutes.splash;
+
+  if (token != null && token.isNotEmpty) {
+    if (role?.toLowerCase() == "doctor") {
+      startRoute = AppRoutes.doctorMain;
+    } else if (role?.toLowerCase() == "patient") {
+      startRoute = AppRoutes.patientMain;
+    }
+  }
+
   Bloc.observer = AppBlocObserver();
   configureDependencies();
-  runApp(const Axon());
+
+  runApp(Axon(startRoute: startRoute));
 }
 
 class Axon extends StatelessWidget {
-  const Axon({super.key});
+  final String startRoute;
+
+  const Axon({super.key, required this.startRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +54,13 @@ class Axon extends StatelessWidget {
               return MaterialApp(
                 debugShowCheckedModeBanner: false,
 
-                /// 🔹 Locale from Cubit
                 locale: locale,
 
-                /// 🔹 Supported languages
-                supportedLocales: const [Locale('en'), Locale('ar')],
+                supportedLocales: const [
+                  Locale('en'),
+                  Locale('ar'),
+                ],
 
-                /// 🔹 Localization delegates (IMPORTANT)
                 localizationsDelegates: const [
                   AppLocalizations.delegate,
                   GlobalMaterialLocalizations.delegate,
@@ -51,13 +70,15 @@ class Axon extends StatelessWidget {
 
                 localeResolutionCallback: (locale, supportedLocales) {
                   for (final supportedLocale in supportedLocales) {
-                    if (supportedLocale.languageCode == locale?.languageCode) {
+                    if (supportedLocale.languageCode ==
+                        locale?.languageCode) {
                       return supportedLocale;
                     }
                   }
                   return supportedLocales.first;
                 },
-                initialRoute: AppRoutes.splash,
+
+                initialRoute: startRoute,
                 onGenerateRoute: AppRoutes.onGenerateRoute,
               );
             },

@@ -9,7 +9,6 @@ import 'package:Axon/core/widgets/custom_text_field.dart';
 import 'package:Axon/features/auth/Presentation/views/widgets/center_icon_header.dart';
 import 'package:Axon/features/auth/Presentation/views/widgets/form_label.dart';
 import 'package:Axon/features/patient/profile_patient/presentation/manager/patient_edit_basic_info/patient_edit_basic_info_cubit.dart';
-import 'package:Axon/core/extensions/context_extension.dart';
 
 class PatientEditBasicInfoView extends StatelessWidget {
   const PatientEditBasicInfoView({super.key});

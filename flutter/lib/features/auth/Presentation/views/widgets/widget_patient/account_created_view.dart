@@ -45,35 +45,46 @@ class _AccountCreatedViewState extends State<AccountCreatedView>
     });
   }
 
-  void _handleNavigation() {
+  void _handleNavigation() async {
 
-  final role =
-      SharedPref.preferences.getString(PrefKeys.userRole);
+  await Future.delayed(const Duration(milliseconds: 300));
+
+  final role = SharedPref().getString(PrefKeys.userRole);
 
   print("========== ACCOUNT CREATED DEBUG ==========");
   print("Role from SharedPref: $role");
   print("===========================================");
 
-  if (role == "doctor") {
+  final normalizedRole = role?.toLowerCase().trim();
+
+  if (normalizedRole == "doctor") {
 
     print("➡️ Navigate to DOCTOR HOME");
 
-    context.pushName(AppRoutes.doctorMain);
+    Navigator.pushReplacementNamed(
+      context,
+      AppRoutes.doctorMain,
+    );
 
-  } else if (role == "patient") {
+  } else if (normalizedRole == "patient") {
 
     print("➡️ Navigate to PATIENT HOME");
 
-    context.pushName(AppRoutes.patientMain);
+    Navigator.pushReplacementNamed(
+      context,
+      AppRoutes.patientMain,
+    );
 
   } else {
 
-    print("⚠️ Role is null → fallback to patientMain");
+    print("⚠️ Role still null → retry");
 
-    context.pushName(AppRoutes.patientMain);
+    Navigator.pushReplacementNamed(
+      context,
+      AppRoutes.patientMain,
+    );
   }
 }
-
   @override
   void dispose() {
     _controller.dispose();

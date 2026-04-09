@@ -69,61 +69,35 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   //todo : save user data
 
- Future<void> saveUserData(Map<String, dynamic> json) async {
+Future<void> saveUserData(Map<String, dynamic> json) async {
 
   final pref = SharedPref();
 
-  print("========= SAVE USER DATA =========");
-  print(json);
-  print("==================================");
-
-  /// status
   await pref.setString(
     PrefKeys.status,
     json["status"]?.toString() ?? "",
   );
 
-  /// message
   await pref.setString(
     PrefKeys.message,
     json["message"]?.toString() ?? "",
   );
 
-  /// access token
-  await pref.setString(
-    PrefKeys.accessToken,
-    json["accessToken"]?.toString() ?? "",
-  );
-
-  /// refresh token
-  await pref.setString(
-    PrefKeys.refreshToken,
-    json["refreshToken"]?.toString() ?? "",
-  );
-
-  /// user id
   await pref.setString(
     PrefKeys.userId,
     json["data"]?["id"]?.toString() ?? "",
   );
 
-  /// role
   await pref.setString(
     PrefKeys.userRole,
     json["data"]?["role"]?.toString() ?? "",
   );
 
-  /// email
   await pref.setString(
     PrefKeys.userEmail,
     json["data"]?["email"]?.toString() ?? "",
   );
-
-  print("Saved Role: ${pref.getString(PrefKeys.userRole)}");
-  print("Saved ID: ${pref.getString(PrefKeys.userId)}");
-  print("Saved Email: ${pref.getString(PrefKeys.userEmail)}");
 }
-
   // todo : login
 
   @override
