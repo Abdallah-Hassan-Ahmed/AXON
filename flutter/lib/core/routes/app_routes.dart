@@ -8,8 +8,6 @@ import 'package:Axon/features/auth/Presentation/views/select_role_view.dart';
 import 'package:Axon/features/auth/Presentation/views/widgets/widget_doctor/account_doctor_created_view.dart';
 import 'package:Axon/features/auth/Presentation/views/widgets/widget_doctor/doctor_registration_view.dart';
 import 'package:Axon/features/auth/Presentation/views/widgets/widget_patient/account_created_view.dart';
-import 'package:Axon/features/auth/Presentation/views/widgets/widget_patient/patient_lab_tests_view.dart';
-import 'package:Axon/features/auth/Presentation/views/widgets/widget_patient/patient_radiology_view.dart';
 import 'package:Axon/features/auth/Presentation/views/widgets/widget_patient/patient_registration_flow.dart';
 import 'package:Axon/features/doctor/Chatting%20Doctor/presentation/views/doctor_chat_view.dart';
 import 'package:Axon/features/doctor/Chatting%20Doctor/presentation/views/doctor_show_patient_profile_view.dart';
@@ -194,7 +192,7 @@ static const viewAll = 'viewAll';
 
       // Forgot Password
       case forgotPasswordEmail:
-        return BaseRoute(page: const ForgotPasswordEmailView());
+        return BaseRoute(page:  ForgotPasswordEmailView());
 
       case forgotPasswordOtp:
         return BaseRoute(page: const ForgotPasswordOtpView());

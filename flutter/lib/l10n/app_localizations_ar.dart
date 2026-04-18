@@ -206,7 +206,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get unmatched_password => 'كلمتا المرور غير متطابقتين';
 
   @override
-  String get unauthorized => 'غير مصرح لك بالوصول';
+  String get unauthorized => 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
 
   @override
   String get not_found => 'العنصر غير موجود';

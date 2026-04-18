@@ -3,6 +3,7 @@ import 'package:Axon/core/style/colors.dart';
 import 'package:Axon/core/widgets/text_app.dart';
 import 'package:Axon/features/patient/medicine/presentation/manager/duration_cubit/duration_cubit.dart';
 import 'package:Axon/features/patient/medicine/presentation/manager/duration_cubit/duration_state.dart';
+import 'package:Axon/features/patient/medicine/presentation/manager/medicine%20cubit/medicine_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -17,6 +18,8 @@ class DurationWidget extends StatelessWidget {
       child: BlocBuilder<DurationCubit, DurationState>(
         builder: (context, state) {
           final cubit = context.read<DurationCubit>();
+          final medicineCubit = context.read<MedicineCubit>();
+
           final formatter = DateFormat('dd MMM yyyy');
 
           Future<void> pickStartDate() async {
@@ -29,6 +32,16 @@ class DurationWidget extends StatelessWidget {
 
             if (date != null) {
               cubit.setStartDate(date);
+
+              /// مهم جدًا
+              if (state.endDate != null) {
+                medicineCubit.setDuration(
+                  start: date,
+                  end: state.endDate!,
+                );
+              }
+
+              print("Start Date Selected => $date");
             }
           }
 
@@ -48,6 +61,14 @@ class DurationWidget extends StatelessWidget {
 
             if (date != null) {
               cubit.setEndDate(date);
+
+              /// أهم سطر في المشكلة كلها 🔥
+              medicineCubit.setDuration(
+                start: state.startDate,
+                end: date,
+              );
+
+              print("End Date Selected => $date");
             }
           }
 
@@ -56,14 +77,12 @@ class DurationWidget extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  /// START DATE
                   Expanded(
                     child: GestureDetector(
                       onTap: pickStartDate,
                       child: _dateBox(
                         title: context.l10n.start_date,
-                        value:
-                            formatter.format(state.startDate),
+                        value: formatter.format(state.startDate),
                         hasError: state.error != null,
                       ),
                     ),
@@ -71,15 +90,13 @@ class DurationWidget extends StatelessWidget {
 
                   const SizedBox(width: 12),
 
-                  /// END DATE
                   Expanded(
                     child: GestureDetector(
                       onTap: pickEndDate,
                       child: _dateBox(
                         title: context.l10n.end_date,
                         value: state.endDate != null
-                            ? formatter
-                                .format(state.endDate!)
+                            ? formatter.format(state.endDate!)
                             : context.l10n.tap_to_select,
                         hasError: state.error != null,
                       ),
@@ -88,7 +105,6 @@ class DurationWidget extends StatelessWidget {
                 ],
               ),
 
-              /// ERROR
               if (state.error != null) ...[
                 const SizedBox(height: 8),
                 Text(

@@ -1,3 +1,4 @@
+import 'package:Axon/core/di/di.dart';
 import 'package:Axon/core/extensions/context_extension.dart';
 import 'package:Axon/core/extensions/localization_ext.dart';
 import 'package:Axon/core/routes/app_routes.dart';
@@ -24,11 +25,13 @@ class QuickActionsSection extends StatelessWidget {
           context.pushName(AppRoutes.bookDoctorTabs);
         },
       ),
+
       QuickActionItem(
         icon: AppImages.hospital1,
         label: context.l10n.hospitals,
         onTap: () {},
       ),
+
       QuickActionItem(
         icon: AppImages.Med1,
         label: context.l10n.medicine,
@@ -37,13 +40,14 @@ class QuickActionsSection extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (_) => BlocProvider(
-                create: (_) => MedicineCubit(),
+                create: (_) => getIt<MedicineCubit>(),
                 child: const AddMedicineView(),
               ),
             ),
           );
         },
       ),
+
       QuickActionItem(
         icon: AppImages.chatBot,
         label: context.l10n.asaly,
@@ -57,7 +61,9 @@ class QuickActionsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          padding: EdgeInsets.symmetric(
+            horizontal: 20.w,
+          ),
           child: TextApp(
             text: context.l10n.quick_actions,
             weight: AppTextWeight.semiBold,
@@ -65,11 +71,18 @@ class QuickActionsSection extends StatelessWidget {
             color: AppColors.black,
           ),
         ),
+
         SizedBox(height: 10.h),
+
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          padding: EdgeInsets.symmetric(
+            horizontal: 16.w,
+          ),
           child: Container(
-            padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 12.w),
+            padding: EdgeInsets.symmetric(
+              vertical: 10.h,
+              horizontal: 12.w,
+            ),
             decoration: BoxDecoration(
               color: AppColors.white,
               borderRadius: BorderRadius.circular(16.r),
@@ -82,7 +95,8 @@ class QuickActionsSection extends StatelessWidget {
               ],
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment:
+                  MainAxisAlignment.spaceBetween,
               children: items,
             ),
           ),

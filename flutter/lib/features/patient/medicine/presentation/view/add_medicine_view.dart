@@ -1,3 +1,4 @@
+import 'package:Axon/core/di/di.dart';
 import 'package:Axon/core/extensions/localization_ext.dart';
 import 'package:Axon/core/style/colors.dart';
 import 'package:Axon/core/widgets/custom_app_bar.dart';
@@ -15,17 +16,25 @@ class AddMedicineView extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => MedicineCubit()),
-        BlocProvider(create: (_) => IntakeTimeCubit()),
-        BlocProvider(create: (_) => DurationCubit()),
+        BlocProvider(
+          create: (_) => getIt<MedicineCubit>(),
+        ),
+        BlocProvider(
+          create: (_) => IntakeTimeCubit(),
+        ),
+        BlocProvider(
+          create: (_) => DurationCubit(),
+        ),
       ],
-      child: Builder( 
+      child: Builder(
         builder: (context) {
           return Scaffold(
             backgroundColor: AppColors.white,
             body: Column(
               children: [
-                 CustomAppBar(title: context.l10n.add_new_medicine),
+                CustomAppBar(
+                  title: context.l10n.add_new_medicine,
+                ),
                 Expanded(
                   child: AddMedicineBody(),
                 ),

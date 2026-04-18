@@ -9,6 +9,15 @@ class IntakeTimeState {
     required this.isAm,
   });
 
+  String get formattedTime {
+    final formattedMinute =
+        minute.toString().padLeft(2, '0');
+
+    final period = isAm ? "AM" : "PM";
+
+    return "$hour:$formattedMinute $period";
+  }
+
   IntakeTimeState copyWith({
     int? hour,
     int? minute,

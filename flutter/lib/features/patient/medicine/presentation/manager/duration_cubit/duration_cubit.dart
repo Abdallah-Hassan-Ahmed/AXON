@@ -12,8 +12,8 @@ class DurationCubit extends Cubit<DurationState> {
         );
 
   void setStartDate(DateTime date) {
-    // ❌ Prevent invalid start date
-    if (state.endDate != null && date.isAfter(state.endDate!)) {
+    if (state.endDate != null &&
+        date.isAfter(state.endDate!)) {
       emit(
         state.copyWith(
           error: "Start date cannot be after end date",
@@ -31,7 +31,6 @@ class DurationCubit extends Cubit<DurationState> {
   }
 
   void setEndDate(DateTime date) {
-    // ❌ Prevent invalid end date
     if (date.isBefore(state.startDate)) {
       emit(
         state.copyWith(

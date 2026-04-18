@@ -10,7 +10,9 @@ class Snackbar {
     final snackBar = SnackBar(
       content: Text(
         message,
-        style: const TextStyle(color: Colors.white),
+        style: const TextStyle(
+          color: Colors.white,
+        ),
       ),
       backgroundColor: backgroundColor,
       duration: duration,
@@ -26,39 +28,47 @@ class Snackbar {
       ..showSnackBar(snackBar);
   }
 
-  // Success Snackbar
-  static void showSuccess(BuildContext context, {required String message}) {
+  static void showSuccess(
+    BuildContext context, {
+    required String message,
+  }) {
     showSnackbar(
       context,
       message: message,
-      backgroundColor: const Color(0xFF4CAF50), 
+      backgroundColor: const Color(0xFF4CAF50),
     );
   }
 
-  // Error Snackbar
-  static void showError(BuildContext context, {required String message}) {
+  static void showError(
+    BuildContext context, {
+    required String message,
+  }) {
     showSnackbar(
       context,
       message: message,
-      backgroundColor: const Color(0xFFE57373), 
+      backgroundColor: const Color(0xFFE57373),
     );
   }
 
-  // Warning Snackbar
-  static void showWarning(BuildContext context, {required String message}) {
+  static void showWarning(
+    BuildContext context, {
+    required String message,
+  }) {
     showSnackbar(
       context,
       message: message,
-      backgroundColor: const Color(0xFFFFB74D), 
+      backgroundColor: const Color(0xFFFFB74D),
     );
   }
 
-  // Info Snackbar
-  static void showInfo(BuildContext context, {required String message}) {
+  static void showInfo(
+    BuildContext context, {
+    required String message,
+  }) {
     showSnackbar(
       context,
       message: message,
-      backgroundColor: const Color(0xFF64B5F6), 
+      backgroundColor: const Color(0xFF64B5F6),
     );
   }
 }

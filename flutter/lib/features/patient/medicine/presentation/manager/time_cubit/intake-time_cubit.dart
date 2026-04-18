@@ -3,7 +3,13 @@ import 'intake_time_state.dart';
 
 class IntakeTimeCubit extends Cubit<IntakeTimeState> {
   IntakeTimeCubit()
-      : super(const IntakeTimeState(hour: 8, minute: 30, isAm: true));
+      : super(
+          const IntakeTimeState(
+            hour: 8,
+            minute: 0,
+            isAm: true,
+          ),
+        );
 
   void setPickedTime({
     required int hour,
@@ -19,6 +25,9 @@ class IntakeTimeCubit extends Cubit<IntakeTimeState> {
     );
   }
 
-  void setAm() => emit(state.copyWith(isAm: true));
-  void setPm() => emit(state.copyWith(isAm: false));
+  void setAm() =>
+      emit(state.copyWith(isAm: true));
+
+  void setPm() =>
+      emit(state.copyWith(isAm: false));
 }

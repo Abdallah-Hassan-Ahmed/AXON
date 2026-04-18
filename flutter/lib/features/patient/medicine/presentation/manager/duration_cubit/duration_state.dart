@@ -5,8 +5,8 @@ class DurationState {
 
   const DurationState({
     required this.startDate,
-    this.endDate,
-    this.error,
+    required this.endDate,
+    required this.error,
   });
 
   DurationState copyWith({

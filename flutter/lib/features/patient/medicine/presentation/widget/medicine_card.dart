@@ -47,21 +47,21 @@ class MedicineCard extends StatelessWidget {
             height: 90.h,
             child: Row(
               children: [
-                Container(
-                  height: 80.h,
-                  width: 70.w,
-                  padding: EdgeInsets.all(12.w),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryColor.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(24.r),
-                  ),
-                  child: Image.asset(
-                    AppImages.medicineIcon2,
-                    height: 40.h,
-                    width: 40.h,
-                  ),
-                ),
-                SizedBox(width: 32.w),
+                // Container(
+                //   height: 80.h,
+                //   width: 70.w,
+                //   padding: EdgeInsets.all(12.w),
+                //   decoration: BoxDecoration(
+                //     color: AppColors.primaryColor.withOpacity(0.05),
+                //     borderRadius: BorderRadius.circular(24.r),
+                //   ),
+                //   child: Image.asset(
+                //     AppImages.medicineIcon2,
+                //     height: 40.h,
+                //     width: 40.h,
+                //   ),
+                // ),
+                // SizedBox(width: 32.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

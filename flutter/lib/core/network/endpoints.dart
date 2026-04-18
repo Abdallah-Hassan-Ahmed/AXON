@@ -1,15 +1,43 @@
 class Endpoints {
- 
   static const String baseUrl =
       "https://tender-morna-axon-fp-b76b6646.koyeb.app/api/v1";
-    static  const baseUrlImage = "https://tender-morna-axon-fp-b76b6646.koyeb.app/";
+
+  static const String baseUrlImage =
+      "https://tender-morna-axon-fp-b76b6646.koyeb.app/";
 
   // ================== AUTH ==================
-  static const String login = "/auth/login";
-  static const String registerDoctor = "/auth/signup-doctor";
-  static const String registerPatient = "/auth/signup-patient";
-  static const String getAllArticales = "/articles";
-  static const createArticle = "/articles/create";
+  static const String login =
+      "/auth/login";
 
-  
+  static const String registerDoctor =
+      "/auth/signup-doctor";
+
+  static const String registerPatient =
+      "/auth/signup-patient";
+
+  static const String forgotPassword =
+      "/auth/forgot-password";
+
+  static const String resetPassword =
+      "/auth/reset-password";
+
+  // ================== ARTICLES ==================
+  static const String getAllArticales =
+      "/articles";
+
+  static const String createArticle =
+      "/articles/create";
+
+  // ================== MEDICINE ==================
+  static const String addMedicine =
+      "/medications";
+
+  static const String getMedicine =
+      "/medications";
+
+  static const String updateMedicine =
+      "/medications";
+
+  static const String deleteMedicine =
+      "/medications";
 }
