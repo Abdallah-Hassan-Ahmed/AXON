@@ -75,6 +75,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get search_medicine => 'ابحث عن دواء';
 
   @override
+  String get edit_medicine => 'تعديل الدواء';
+
+  @override
   String get medicine_example => 'مثال: فيتامين د';
 
   @override

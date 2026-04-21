@@ -75,6 +75,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get search_medicine => 'Search medicine';
 
   @override
+  String get edit_medicine => 'Edit Medicine';
+
+  @override
   String get medicine_example => 'e.g. Vitamin D';
 
   @override

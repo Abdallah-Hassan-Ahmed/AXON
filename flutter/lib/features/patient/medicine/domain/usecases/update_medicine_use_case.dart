@@ -15,7 +15,7 @@ class UpdateMedicineUseCase {
     required String medicineId,
     required String medicineName,
     required String frequency,
-    required List<String> intakeTime,
+    required String intakeTime,
     required String startDate,
     required String endDate,
   }) {

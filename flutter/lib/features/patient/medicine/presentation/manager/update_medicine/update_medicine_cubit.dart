@@ -3,36 +3,77 @@ import 'package:Axon/features/patient/medicine/presentation/manager/update_medic
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
-
-
 @injectable
-class UpdateMedicineCubit
-    extends Cubit<UpdateMedicineState> {
-  final UpdateMedicineUseCase
-      updateMedicineUseCase;
+class UpdateMedicineCubit extends Cubit<UpdateMedicineState> {
+  final UpdateMedicineUseCase updateMedicineUseCase;
+
+  /// Frequency
+  String selectedFrequency = "once daily";
+
+  /// Intake Time
+  String selectedIntakeTime = "";
+
+  /// Duration
+  String selectedStartDate = "";
+  String selectedEndDate = "";
 
   UpdateMedicineCubit({
     required this.updateMedicineUseCase,
   }) : super(UpdateMedicineInitial());
 
+  /// ================================
+  /// تحميل البيانات القديمة من الكارد
+  /// ================================
+  void setInitialValues({
+    required String frequency,
+    required String intakeTime,
+    required String startDate,
+    required String endDate,
+  }) {
+    selectedFrequency = frequency.toLowerCase();
+
+    /// هنا أهم سطر 🔥
+    selectedIntakeTime = intakeTime;
+
+    selectedStartDate = startDate;
+    selectedEndDate = endDate;
+
+    emit(UpdateMedicineInitial());
+  }
+
+  /// ================================
+  /// Update Medicine API
+  /// ================================
   Future<void> updateMedicine({
     required String medicineId,
     required String medicineName,
     required String frequency,
-    required List<String> intakeTime,
+    required String intakeTime,
     required String startDate,
     required String endDate,
   }) async {
     emit(UpdateMedicineLoading());
 
-    final result =
-        await updateMedicineUseCase.call(
+    final result = await updateMedicineUseCase.call(
       medicineId: medicineId,
       medicineName: medicineName,
-      frequency: frequency,
-      intakeTime: intakeTime,
-      startDate: startDate,
-      endDate: endDate,
+
+      /// نرسل القيمة المختارة من الـ dropdown
+      frequency: selectedFrequency,
+
+      /// نرسل الـ intake الحقيقي
+      intakeTime: selectedIntakeTime.isNotEmpty
+          ? selectedIntakeTime
+          : intakeTime,
+
+      /// نرسل التواريخ المعدلة أو القديمة
+      startDate: selectedStartDate.isNotEmpty
+          ? selectedStartDate
+          : startDate,
+
+      endDate: selectedEndDate.isNotEmpty
+          ? selectedEndDate
+          : endDate,
     );
 
     result.fold(
@@ -43,7 +84,7 @@ class UpdateMedicineCubit
           ),
         );
       },
-      (response) {
+      (_) {
         emit(UpdateMedicineSuccess());
       },
     );

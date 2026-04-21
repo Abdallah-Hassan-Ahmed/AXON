@@ -7,6 +7,7 @@ import 'package:Axon/features/patient/medicine/presentation/manager/get_medicine
 import 'package:Axon/features/patient/medicine/presentation/manager/medicine_filter/medicine_filter_cubit.dart';
 import 'package:Axon/features/patient/medicine/presentation/manager/medicine_filter/medicine_filter_state.dart';
 import 'package:Axon/features/patient/medicine/presentation/manager/update_medicine/update_medicine_cubit.dart';
+import 'package:Axon/features/patient/medicine/presentation/view/update_medicine_view.dart';
 import 'package:Axon/features/patient/medicine/presentation/widget/medicine_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -111,23 +112,26 @@ class MedicineList extends StatelessWidget {
                     nextTime: nextTime,
 
                     /// UPDATE
-                    onEdit: () {
-                      context
-                          .read<UpdateMedicineCubit>()
-                          .updateMedicine(
-                            medicineId: item.id,
-                            medicineName:
-                                item.medicineName,
-                            frequency:
-                                item.frequency,
-                            intakeTime:
-                                item.intakeTime,
-                            startDate:
-                                item.startDate,
-                            endDate:
-                                item.endDate,
-                          );
-                    },
+                  onEdit: () {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => UpdateMedicineView(
+        medicineId: item.id,
+        medicineName: item.medicineName,
+        frequency: item.frequency,
+
+        /// هنا التعديل 🔥
+        intakeTime: item.intakeTime.isNotEmpty
+            ? item.intakeTime.first
+            : "08:00",
+
+        startDate: item.startDate,
+        endDate: item.endDate,
+      ),
+    ),
+  );
+},
 
                     /// DELETE
                     onDelete: () async {

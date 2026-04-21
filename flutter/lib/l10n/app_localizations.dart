@@ -230,6 +230,12 @@ abstract class AppLocalizations {
   /// **'Search medicine'**
   String get search_medicine;
 
+  /// No description provided for @edit_medicine.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Medicine'**
+  String get edit_medicine;
+
   /// No description provided for @medicine_example.
   ///
   /// In en, this message translates to:
