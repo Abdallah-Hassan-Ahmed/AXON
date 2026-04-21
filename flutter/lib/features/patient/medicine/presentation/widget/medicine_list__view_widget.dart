@@ -6,7 +6,6 @@ import 'package:Axon/features/patient/medicine/presentation/manager/get_medicine
 import 'package:Axon/features/patient/medicine/presentation/manager/get_medicine.dart/medicine_list_state.dart';
 import 'package:Axon/features/patient/medicine/presentation/manager/medicine_filter/medicine_filter_cubit.dart';
 import 'package:Axon/features/patient/medicine/presentation/manager/medicine_filter/medicine_filter_state.dart';
-import 'package:Axon/features/patient/medicine/presentation/manager/update_medicine/update_medicine_cubit.dart';
 import 'package:Axon/features/patient/medicine/presentation/view/update_medicine_view.dart';
 import 'package:Axon/features/patient/medicine/presentation/widget/medicine_card.dart';
 import 'package:flutter/material.dart';
@@ -41,9 +40,10 @@ class MedicineList extends StatelessWidget {
         if (medicineState is MedicineListSuccess) {
           return BlocBuilder<MedicineFilterCubit, MedicineFilterState>(
             builder: (context, filterState) {
-              /// عرض كل الأدوية + البحث فقط
+              /// فلترة البحث + فلترة التاريخ 🔥
               final filtered =
                   medicineState.medicines.where((medicine) {
+                /// البحث بالاسم
                 final matchSearch = medicine
                     .medicineName
                     .toLowerCase()
@@ -51,7 +51,52 @@ class MedicineList extends StatelessWidget {
                       filterState.search.toLowerCase(),
                     );
 
-                return matchSearch;
+                /// فلترة التاريخ
+                bool matchDate = true;
+
+                if (filterState.date != null) {
+                  final selectedDate = DateTime(
+                    filterState.date!.year,
+                    filterState.date!.month,
+                    filterState.date!.day,
+                  );
+
+                  final startDate =
+                      DateTime.parse(medicine.startDate);
+
+                  final endDate =
+                      DateTime.parse(medicine.endDate);
+
+                  final normalizedStart = DateTime(
+                    startDate.year,
+                    startDate.month,
+                    startDate.day,
+                  );
+
+                  final normalizedEnd = DateTime(
+                    endDate.year,
+                    endDate.month,
+                    endDate.day,
+                  );
+
+                  /// يظهر الدواء لو التاريخ المختار
+                  /// داخل مدة العلاج
+                  matchDate =
+                      selectedDate.isAtSameMomentAs(
+                            normalizedStart,
+                          ) ||
+                          selectedDate.isAtSameMomentAs(
+                            normalizedEnd,
+                          ) ||
+                          (selectedDate.isAfter(
+                                normalizedStart,
+                              ) &&
+                              selectedDate.isBefore(
+                                normalizedEnd,
+                              ));
+                }
+
+                return matchSearch && matchDate;
               }).toList();
 
               /// ترتيب حسب التاريخ ثم الوقت
@@ -106,52 +151,66 @@ class MedicineList extends StatelessWidget {
                       item.frequency;
 
                   return MedicineCard(
-                    id: item.id,
-                    name: item.medicineName,
-                    frequency: frequency,
-                    nextTime: nextTime,
+  id: item.id,
+  name: item.medicineName,
+  frequency: item.frequency,
+  nextTime: nextTime,
+  startDate: item.startDate,
+  endDate: item.endDate,
 
                     /// UPDATE
-                onEdit: () async {
-  final result = await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => UpdateMedicineView(
-        medicineId: item.id,
-        medicineName: item.medicineName,
-        frequency: item.frequency,
-        intakeTime: item.intakeTime.isNotEmpty
-            ? item.intakeTime.first
-            : "08:00",
-        startDate: item.startDate,
-        endDate: item.endDate,
-      ),
-    ),
-  );
+                    onEdit: () async {
+                      final result =
+                          await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              UpdateMedicineView(
+                            medicineId: item.id,
+                            medicineName:
+                                item.medicineName,
+                            frequency: item.frequency,
+                            intakeTime:
+                                item.intakeTime
+                                        .isNotEmpty
+                                    ? item.intakeTime
+                                        .first
+                                    : "08:00",
+                            startDate:
+                                item.startDate,
+                            endDate: item.endDate,
+                          ),
+                        ),
+                      );
 
-  print("UPDATE RESULT => $result");
+                      print(
+                          "UPDATE RESULT => $result");
 
-  if (result == true) {
-    print("REFRESH MEDICINES 🔥");
+                      if (result == true) {
+                        print(
+                            "REFRESH MEDICINES 🔥");
 
-    context
-        .read<MedicineListCubit>()
-        .getMedicines();
-  }
-},
+                        context
+                            .read<
+                                MedicineListCubit>()
+                            .getMedicines();
+                      }
+                    },
 
                     /// DELETE
                     onDelete: () async {
-  await context
-      .read<DeleteMedicineCubit>()
-      .deleteMedicine(
-        item.id,
-      );
+                      await context
+                          .read<
+                              DeleteMedicineCubit>()
+                          .deleteMedicine(
+                            item.id,
+                          );
 
-  context
-      .read<MedicineListCubit>()
-      .getMedicines();
-}
+                      context
+                          .read<
+                              MedicineListCubit>()
+                          .getMedicines();
+                    },
                   );
                 },
                 separatorBuilder: (_, __) =>
