@@ -1,3 +1,4 @@
+import 'package:Axon/core/di/di.dart';
 import 'package:Axon/core/routes/base_routes.dart';
 import 'package:Axon/features/auth/Presentation/views/forgot_password_email_view.dart';
 import 'package:Axon/features/auth/Presentation/views/forgot_password_otp_view.dart';
@@ -20,8 +21,10 @@ import 'package:Axon/features/doctor/Home%20Doctor/presentation/views/doctor_mai
 import 'package:Axon/features/doctor/Profile%20Doctor/presentation/views/doctor_edit_profile_view.dart';
 import 'package:Axon/features/onboarding/presentation/views/intro_view.dart';
 import 'package:Axon/features/onboarding/presentation/views/onboarding_view.dart';
-import 'package:Axon/features/patient/book_doctor/data/models/doctor_model.dart';
-import 'package:Axon/features/patient/book_doctor/data/repo/doctor_repository.dart';
+
+import 'package:Axon/features/patient/book_doctor/domain/entities/doctor_entity.dart';
+import 'package:Axon/features/patient/book_doctor/domain/useCases/get_all_doctors_usecase.dart';
+import 'package:Axon/features/patient/book_doctor/domain/useCases/search_doctors_usecase.dart';
 import 'package:Axon/features/patient/book_doctor/prsentation/manager/doctors_cubit.dart';
 import 'package:Axon/features/patient/book_doctor/prsentation/view/book_doctor_view.dart';
 import 'package:Axon/features/patient/book_doctor/prsentation/view/doctor_details_view.dart';
@@ -355,25 +358,32 @@ case chatBot:
   case AppRoutes.bookDoctorTabs:
   return BaseRoute(
     page: BlocProvider(
-      create: (_) => DoctorsCubit(DoctorRepository()),
+      create: (_) => DoctorsCubit(
+        getAllDoctorsUseCase: getIt<GetAllDoctorsUseCase>(),
+        searchDoctorsUseCase: getIt<SearchDoctorsUseCase>(),
+      )..getAllDoctors(),
       child: const DoctorsTabsView(),
     ),
   );
 
-
-
-
 case AppRoutes.doctorDetails:
-  final doctor = settings.arguments as DoctorModel;
+  final doctor = settings.arguments as DoctorEntity;
+
   return BaseRoute(
-    page: DoctorDetailsView(doctor: doctor),
+    page: DoctorDetailsView(
+      doctor: doctor,
+    ),
   );
 
 case AppRoutes.bookDoctor:
-  final doctor = settings.arguments as DoctorModel;
+  final doctor = settings.arguments as DoctorEntity;
+
   return BaseRoute(
-    page: BookDoctorView(doctor: doctor),
+    page: BookDoctorView(
+      doctor: doctor,
+    ),
   );
+
   case AppRoutes.patientArticleDetails:
   final articleId = settings.arguments as String;
 

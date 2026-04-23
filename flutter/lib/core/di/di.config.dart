@@ -55,6 +55,22 @@ import '../../features/doctor/Articles%20Doctor/domain/usecases/create_article_u
     as _i194;
 import '../../features/doctor/Articles%20Doctor/presentation/manager/doctor_articles_cubit.dart'
     as _i197;
+import '../../features/patient/book_doctor/data/data_sourses/remote_data/doctors_remote_data_source.dart'
+    as _i846;
+import '../../features/patient/book_doctor/data/data_sourses/remote_data/impl/doctors_remote_data_source_impl.dart'
+    as _i983;
+import '../../features/patient/book_doctor/data/repo_impl/doctors_repo_impl.dart'
+    as _i514;
+import '../../features/patient/book_doctor/domain/repo/doctors_repo.dart'
+    as _i396;
+import '../../features/patient/book_doctor/domain/useCases/get_all_doctors_usecase.dart'
+    as _i826;
+import '../../features/patient/book_doctor/domain/useCases/get_doctor_by_id_usecase.dart'
+    as _i94;
+import '../../features/patient/book_doctor/domain/useCases/search_doctors_usecase.dart'
+    as _i182;
+import '../../features/patient/book_doctor/prsentation/manager/doctors_cubit.dart'
+    as _i649;
 import '../../features/patient/home_patient/data/data_sources/home_remote_datasource.dart'
     as _i379;
 import '../../features/patient/home_patient/data/data_sources/impl/home_remote_datasource_impl.dart'
@@ -99,8 +115,6 @@ import '../../features/patient/profile_patient/data/data/profile_ptient_impl/pro
     as _i72;
 import '../../features/patient/profile_patient/domain/repo/profile_patient_repo.dart'
     as _i556;
-import '../../features/patient/profile_patient/domain/useCases/update_profile_patient_use_case.dart'
-    as _i768;
 import '../../features/patient/profile_patient/domain/usecases/update_profile_patient_use_case.dart'
     as _i786;
 import '../../features/patient/profile_patient/presentation/manager/Patient%20Dynamic%20List/patient_edit_dynamic_list_cubit.dart'
@@ -155,6 +169,17 @@ extension GetItInjectableX on _i174.GetIt {
         apiManager: gh<_i119.ApiManager>(),
       ),
     );
+    gh.factory<_i846.DoctorsRemoteDataSource>(
+      () => _i983.DoctorsRemoteDataSourceImpl(
+        networkInfo: gh<_i932.NetworkInfo>(),
+        apiManager: gh<_i119.ApiManager>(),
+      ),
+    );
+    gh.factory<_i396.DoctorsRepo>(
+      () => _i514.DoctorsRepoImpl(
+        doctorsRemoteDataSource: gh<_i846.DoctorsRemoteDataSource>(),
+      ),
+    );
     gh.factory<_i223.AuthRemoteDataSource>(
       () => _i810.AuthRemoteDataSourceImpl(
         networkInfo: gh<_i932.NetworkInfo>(),
@@ -192,6 +217,15 @@ extension GetItInjectableX on _i174.GetIt {
         updateMedicineUseCase: gh<_i403.UpdateMedicineUseCase>(),
       ),
     );
+    gh.factory<_i826.GetAllDoctorsUseCase>(
+      () => _i826.GetAllDoctorsUseCase(gh<_i396.DoctorsRepo>()),
+    );
+    gh.factory<_i94.GetDoctorByIdUseCase>(
+      () => _i94.GetDoctorByIdUseCase(gh<_i396.DoctorsRepo>()),
+    );
+    gh.factory<_i182.SearchDoctorsUseCase>(
+      () => _i182.SearchDoctorsUseCase(gh<_i396.DoctorsRepo>()),
+    );
     gh.factory<_i556.ProfilePatientRepo>(
       () => _i72.ProfilePatientRepoImpl(
         profilePatientRemoteDataSource:
@@ -213,11 +247,14 @@ extension GetItInjectableX on _i174.GetIt {
         getMedicinesUseCase: gh<_i24.GetMedicinesUseCase>(),
       ),
     );
+    gh.factory<_i649.DoctorsCubit>(
+      () => _i649.DoctorsCubit(
+        getAllDoctorsUseCase: gh<_i826.GetAllDoctorsUseCase>(),
+        searchDoctorsUseCase: gh<_i182.SearchDoctorsUseCase>(),
+      ),
+    );
     gh.factory<_i197.DoctorArticlesCubit>(
       () => _i197.DoctorArticlesCubit(gh<_i194.CreateArticleUseCase>()),
-    );
-    gh.factory<_i768.UpdateProfilePatientUseCase>(
-      () => _i768.UpdateProfilePatientUseCase(gh<_i556.ProfilePatientRepo>()),
     );
     gh.factory<_i786.UpdateProfilePatientUseCase>(
       () => _i786.UpdateProfilePatientUseCase(gh<_i556.ProfilePatientRepo>()),

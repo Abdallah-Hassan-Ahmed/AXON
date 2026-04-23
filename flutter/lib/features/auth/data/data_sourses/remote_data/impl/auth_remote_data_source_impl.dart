@@ -199,9 +199,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     (medicalProfile["labTests"] ?? []).toString(),
   );
 
-  /// ==============================
-  /// DOCTOR DATA
-  /// ==============================
+
 
   await pref.setString(
     PrefKeys.specialization,

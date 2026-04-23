@@ -1,16 +1,18 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:Axon/core/style/colors.dart';
 import 'package:Axon/core/widgets/text_app.dart';
 import 'package:Axon/core/widgets/custom_button.dart';
-import 'package:Axon/core/extensions/localization_ext.dart';
-import '../../data/models/doctor_model.dart';
-import '../view/doctor_details_view.dart';
+import 'package:Axon/features/patient/book_doctor/domain/entities/doctor_entity.dart';
+import 'package:Axon/features/patient/book_doctor/prsentation/view/doctor_details_view.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DoctorCard extends StatelessWidget {
-  final DoctorModel doctor;
+  final DoctorEntity doctor;
 
-  const DoctorCard({super.key, required this.doctor});
+  const DoctorCard({
+    super.key,
+    required this.doctor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -33,31 +35,49 @@ class DoctorCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 28.r,
-              backgroundImage: AssetImage(doctor.image),
+              child: Text(
+                doctor.fullName.isNotEmpty
+                    ? doctor.fullName[0]
+                    : "D",
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
 
             SizedBox(width: 12.w),
 
             Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
                   TextApp(
-                    text: doctor.name,
-                    weight: AppTextWeight.semiBold,
+                    text: doctor.fullName,
+                    weight:
+                        AppTextWeight.semiBold,
                   ),
+
                   SizedBox(height: 4.h),
+
                   TextApp(
-                    text: doctor.specialty,
+                    text:
+                        doctor.specialization ??
+                            "",
                     fontSize: 12,
                     color: AppColors.grey,
                   ),
+
                   SizedBox(height: 6.h),
+
                   TextApp(
-                    text: '${doctor.price} EGP',
+                    text:
+                        "${doctor.price} EGP",
                     fontSize: 12,
-                    color: AppColors.primaryColor,
-                    weight: AppTextWeight.bold,
+                    color: AppColors
+                        .primaryColor,
+                    weight:
+                        AppTextWeight.bold,
                   ),
                 ],
               ),
@@ -67,13 +87,15 @@ class DoctorCard extends StatelessWidget {
               width: 80.w,
               height: 34.h,
               borderRadius: 12.r,
-              text: context.l10n.more,
+              text: "More",
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) =>
-                        DoctorDetailsView(doctor: doctor),
+                        DoctorDetailsView(
+                      doctor: doctor,
+                    ),
                   ),
                 );
               },

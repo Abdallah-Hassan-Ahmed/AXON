@@ -1,54 +1,111 @@
-import 'package:Axon/features/patient/book_doctor/data/repo/doctor_repository.dart';
+import 'package:Axon/features/patient/book_doctor/domain/entities/doctor_entity.dart';
+import 'package:Axon/features/patient/book_doctor/domain/useCases/get_all_doctors_usecase.dart';
+import 'package:Axon/features/patient/book_doctor/domain/useCases/search_doctors_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../data/models/doctor_model.dart';
+import 'package:injectable/injectable.dart';
 import 'doctors_state.dart';
 
+@injectable
 class DoctorsCubit extends Cubit<DoctorsState> {
-  final DoctorRepository repository;
+  final GetAllDoctorsUseCase getAllDoctorsUseCase;
+  final SearchDoctorsUseCase searchDoctorsUseCase;
 
-  DoctorsCubit(this.repository) : super(DoctorsInitial()) {
-    loadDoctors();
-  }
+  DoctorsCubit({
+    required this.getAllDoctorsUseCase,
+    required this.searchDoctorsUseCase,
+  }) : super(DoctorsInitial());
 
-  late final List<DoctorModel> _allDoctors;
-  String _currentCategory = 'All';
-  String _searchQuery = '';
+  List<DoctorEntity> _allDoctors = [];
+  String _currentCategory = "All";
 
-  void loadDoctors() {
-    _allDoctors = repository.getDoctors();
-    _emitFiltered();
+  Future<void> getAllDoctors() async {
+    emit(DoctorsLoading());
+
+    final result = await getAllDoctorsUseCase.invoke();
+
+    result.fold(
+      (failure) {
+        print("get all doctors cubit error: $failure");
+
+        emit(
+          DoctorsError(
+            failure: failure,
+          ),
+        );
+      },
+      (doctors) {
+        print(
+          "get all doctors cubit success: ${doctors.length}",
+        );
+
+        _allDoctors = doctors;
+
+        emit(
+          DoctorsSuccess(
+            allDoctors: doctors,
+            filteredDoctors: doctors,
+          ),
+        );
+      },
+    );
   }
 
   void filterBySpecialty(String specialty) {
     _currentCategory = specialty;
-    _emitFiltered();
-  }
 
-  void searchDoctors(String query) {
-    _searchQuery = query.toLowerCase();
-    _emitFiltered();
-  }
+    List<DoctorEntity> result = _allDoctors;
 
-  void _emitFiltered() {
-    List<DoctorModel> result = _allDoctors;
-
-    if (_currentCategory != 'All') {
-      result =
-          result.where((d) => d.specialty == _currentCategory).toList();
-    }
-
-    if (_searchQuery.isNotEmpty) {
-      result = result.where((d) {
-        return d.name.toLowerCase().contains(_searchQuery) ||
-            d.specialty.toLowerCase().contains(_searchQuery);
+    if (specialty != "All") {
+      result = _allDoctors.where((doctor) {
+        return (doctor.specialization ?? "")
+            .toLowerCase()
+            .contains(
+              specialty.toLowerCase(),
+            );
       }).toList();
     }
 
     emit(
-      DoctorsLoaded(
+      DoctorsSuccess(
         allDoctors: _allDoctors,
         filteredDoctors: result,
       ),
+    );
+  }
+
+  Future<void> searchDoctors({
+    required String keyword,
+  }) async {
+    emit(DoctorsLoading());
+
+    final result = await searchDoctorsUseCase.invoke(
+      keyword: keyword,
+    );
+
+    result.fold(
+      (failure) {
+        print(
+          "search doctors cubit error: $failure",
+        );
+
+        emit(
+          DoctorsError(
+            failure: failure,
+          ),
+        );
+      },
+      (doctors) {
+        print(
+          "search doctors cubit success: ${doctors.length}",
+        );
+
+        emit(
+          DoctorsSuccess(
+            allDoctors: _allDoctors,
+            filteredDoctors: doctors,
+          ),
+        );
+      },
     );
   }
 }

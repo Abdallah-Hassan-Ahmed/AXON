@@ -1,15 +1,26 @@
-import 'package:Axon/features/patient/book_doctor/data/models/doctor_model.dart';
+import 'package:Axon/core/errors/failures.dart';
+import 'package:Axon/features/patient/book_doctor/domain/entities/doctor_entity.dart';
 
 abstract class DoctorsState {}
 
 class DoctorsInitial extends DoctorsState {}
 
-class DoctorsLoaded extends DoctorsState {
-  final List<DoctorModel> allDoctors;
-  final List<DoctorModel> filteredDoctors;
+class DoctorsLoading extends DoctorsState {}
 
-  DoctorsLoaded({
+class DoctorsSuccess extends DoctorsState {
+  final List<DoctorEntity> allDoctors;
+  final List<DoctorEntity> filteredDoctors;
+
+  DoctorsSuccess({
     required this.allDoctors,
     required this.filteredDoctors,
+  });
+}
+
+class DoctorsError extends DoctorsState {
+  final Failure failure;
+
+  DoctorsError({
+    required this.failure,
   });
 }

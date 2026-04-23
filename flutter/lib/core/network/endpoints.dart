@@ -47,4 +47,15 @@ class Endpoints {
 
 
       static const String updateMe = "/auth/updateMe";
+
+
+
+      // endpoints.dart
+
+
+
+  static const String getAllDoctors = "/auth/all-doctors";
+  static const String getDoctorById = "/auth/doctor";
+  static const String searchDoctors = "/auth/search-doctors";
+
 }

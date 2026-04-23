@@ -1,4 +1,7 @@
 import 'package:Axon/core/widgets/custom_text_field.dart';
+import 'package:Axon/features/patient/book_doctor/prsentation/manager/doctors_cubit.dart';
+import 'package:Axon/features/patient/book_doctor/prsentation/manager/doctors_state.dart';
+import 'package:Axon/features/patient/book_doctor/prsentation/widget/doctor_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,9 +9,6 @@ import 'package:Axon/core/style/colors.dart';
 import 'package:Axon/core/widgets/custom_app_bar.dart';
 import 'package:Axon/core/widgets/text_app.dart';
 import 'package:Axon/core/extensions/localization_ext.dart';
-import '../manager/doctors_cubit.dart';
-import '../manager/doctors_state.dart';
-import '../widget/doctor_card.dart';
 
 class DoctorsTabsView extends StatefulWidget {
   const DoctorsTabsView({super.key});
@@ -25,9 +25,19 @@ class _DoctorsTabsViewState extends State<DoctorsTabsView> {
   late List<String> categories;
 
   @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<DoctorsCubit>().getAllDoctors();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     categories = [
       context.l10n.all,
+      context.l10n.cardiology,
       context.l10n.heart,
       context.l10n.internal,
       context.l10n.kidney,
@@ -43,21 +53,43 @@ class _DoctorsTabsViewState extends State<DoctorsTabsView> {
           children: [
             CustomAppBar(
               title: context.l10n.doctors,
-              trailing: const Icon(Icons.search, color: AppColors.white),
+              trailing: const Icon(
+                Icons.search,
+                color: AppColors.white,
+              ),
               onTrailingTap: () {
-                setState(() => showSearch = !showSearch);
+                setState(() {
+                  showSearch = !showSearch;
+                });
               },
             ),
 
             if (showSearch)
               Padding(
-                padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 4.h),
+                padding: EdgeInsets.fromLTRB(
+                  16.w,
+                  12.h,
+                  16.w,
+                  4.h,
+                ),
                 child: CustomTextField(
                   controller: searchController,
-                  hintText: context.l10n.search_doctor_specialty,
+                  hintText:
+                      context.l10n.search_doctor_specialty,
                   prefixIcon: const Icon(Icons.search),
-                  onChanged: (v) =>
-                      context.read<DoctorsCubit>().searchDoctors(v),
+                  onChanged: (value) {
+                    if (value.trim().isEmpty) {
+                      context
+                          .read<DoctorsCubit>()
+                          .getAllDoctors();
+                    } else {
+                      context
+                          .read<DoctorsCubit>()
+                          .searchDoctors(
+                            keyword: value,
+                          );
+                    }
+                  },
                 ),
               ),
 
@@ -67,28 +99,43 @@ class _DoctorsTabsViewState extends State<DoctorsTabsView> {
               height: 35.h,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16.w,
+                ),
                 itemCount: categories.length,
-                separatorBuilder: (_, __) => SizedBox(width: 10.w),
+                separatorBuilder: (_, __) =>
+                    SizedBox(width: 10.w),
                 itemBuilder: (_, i) {
                   final isSelected = i == selectedIndex;
+
                   return GestureDetector(
                     onTap: () {
-                      setState(() => selectedIndex = i);
+                      setState(() {
+                        selectedIndex = i;
+                      });
+
                       context
                           .read<DoctorsCubit>()
-                          .filterBySpecialty(categories[i]);
+                          .filterBySpecialty(
+                            categories[i],
+                          );
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(
-                          horizontal: 18.w, vertical: 7.h),
+                        horizontal: 18.w,
+                        vertical: 7.h,
+                      ),
                       decoration: BoxDecoration(
                         color: isSelected
                             ? AppColors.primaryColor
                             : AppColors.white,
-                        borderRadius: BorderRadius.circular(28.r),
+                        borderRadius:
+                            BorderRadius.circular(
+                          28.r,
+                        ),
                         border: Border.all(
-                          color: AppColors.primaryColor.withOpacity(.3),
+                          color: AppColors.primaryColor
+                              .withOpacity(.3),
                         ),
                       ),
                       child: TextApp(
@@ -97,7 +144,8 @@ class _DoctorsTabsViewState extends State<DoctorsTabsView> {
                             ? AppColors.white
                             : AppColors.primaryColor,
                         fontSize: 12,
-                        weight: AppTextWeight.semiBold,
+                        weight:
+                            AppTextWeight.semiBold,
                       ),
                     ),
                   );
@@ -108,20 +156,51 @@ class _DoctorsTabsViewState extends State<DoctorsTabsView> {
             SizedBox(height: 16.h),
 
             Expanded(
-              child: BlocBuilder<DoctorsCubit, DoctorsState>(
+              child: BlocBuilder<
+                  DoctorsCubit,
+                  DoctorsState>(
                 builder: (_, state) {
-                  if (state is DoctorsLoaded) {
+                  if (state is DoctorsLoading) {
+                    return const Center(
+                      child:
+                          CircularProgressIndicator(),
+                    );
+                  }
+
+                  if (state is DoctorsSuccess) {
+                    if (state.filteredDoctors
+                        .isEmpty) {
+                      return const Center(
+                        child: Text(
+                          "No Doctors Found",
+                        ),
+                      );
+                    }
+
                     return ListView.separated(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16.w),
-                      itemCount: state.filteredDoctors.length,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                      ),
+                      itemCount:
+                          state.filteredDoctors.length,
                       separatorBuilder: (_, __) =>
                           SizedBox(height: 14.h),
-                      itemBuilder: (_, i) => DoctorCard(
-                        doctor: state.filteredDoctors[i],
+                      itemBuilder: (_, i) =>
+                          DoctorCard(
+                        doctor:
+                            state.filteredDoctors[i],
                       ),
                     );
                   }
+
+                  if (state is DoctorsError) {
+                    return Center(
+                      child: Text(
+                        state.failure.toString(),
+                      ),
+                    );
+                  }
+
                   return const SizedBox();
                 },
               ),
